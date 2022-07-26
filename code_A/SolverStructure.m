@@ -24,6 +24,7 @@ classdef SolverStructure < handle
         sig
         FB
         u
+        R
 
         
     end
@@ -36,6 +37,7 @@ classdef SolverStructure < handle
         n_el            % Total number of elements
         n_nod           % Number of nodes for each element
         n_el_dof        % Number of DOFs for each element 
+
     end
 
         methods (Access = public)
@@ -68,16 +70,16 @@ classdef SolverStructure < handle
                 
                 Kel = computeKelBar(obj.n_d,obj.n_el,obj.n_el_dof,obj.x,obj.Tn,obj.mat,obj.Tmat);
                
-                KG = assemblyKG(obj.n_el,obj.n_el_dof,obj.n_dof,Td,Kel);
                 
+                KG = assemblyKG(obj.n_el,obj.n_el_dof,obj.n_dof,Td,Kel); 
                 Fext = computeF(obj.n_i,obj.n_dof,obj.Fdata);
                 
                 [vL,vR,uR] = applyCond(obj.n_i,obj.n_dof,obj.fixNod);
                 
-                [obj.u,R] = solveSys(vL,vR,uR,KG,Fext);
                 
-                [obj.eps,obj.sig] = computeStrainStressBar(obj.n_d,obj.n_el,obj.u,Td,obj.x,obj.Tn,obj.mat,obj.Tmat);
+                [obj.u,obj.R] = obj.SolveSystem(vL,vR,uR,KG,Fext); %This function is defined in the subclasses!!!!
                
+                [obj.eps,obj.sig] = computeStrainStressBar(obj.n_d,obj.n_el,obj.u,Td,obj.x,obj.Tn,obj.mat,obj.Tmat);
                 [obj.FB] = bucklingFailure(obj.mat,obj.Tmat,obj.x,obj.Tn,obj.n_el, obj.sig);
             end
 
