@@ -1,5 +1,5 @@
 classdef SolverStructure < handle
-    %UNTITLED2 Summary of this class goes here
+    %Father Class
     %   Detailed explanation goes here
 
     properties (Access = public)
@@ -104,3 +104,5 @@ classdef SolverStructure < handle
             end
         end
 end
+
+
