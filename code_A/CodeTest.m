@@ -1,13 +1,22 @@
-Test1 = SolverStructureDirect; %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one use.
+clear
+clc
+
+load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\Test\KG.mat')
 load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\Test\Fext.mat')
-load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\Test\KB.mat')
+load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\Test\u_dir.mat')
 load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\Test\u_iter.mat')
+
+
+Test1 = SolverStructureDirect; %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one use.
+Test2 = SolverStructureIterative; %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one use.
+
 
 %% Check in Validation
 
 valKG       = true;
 valFext     = true;
-valU_Iter   = true;
+valU_dir    = true;
+valU_iter   = true;
 
 %% DEFINE PROPERTIES-EXAMPLE
 
@@ -81,7 +90,7 @@ InputStructure(Test2,x,Tn,Fdata,fixNod,Tmat)
 SolveStructure(Test1)
 SolveStructure(Test2)
 
-
+clc
 %% Validator
 if valKG
     if Test1.KG == KG 
@@ -114,3 +123,4 @@ if valU_iter
         error('ERROR in Displacement by iterative method');
     end
 end
+clear

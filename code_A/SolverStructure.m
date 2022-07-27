@@ -2,7 +2,7 @@ classdef SolverStructure < handle
     % Father Class
     % This class is not for use! (SolveSystem not implemented)
 
-    properties (Access = public)
+    properties (Access = public, Hidden)
         % INPUT DATA
         F               %[N]
         Young           %[Pa]
