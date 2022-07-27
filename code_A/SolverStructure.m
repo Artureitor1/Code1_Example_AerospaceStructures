@@ -64,6 +64,11 @@ classdef SolverStructure < handle
                 end
             end
             function obj = SolveStructure(obj)
+                
+                if isempty(obj.x) == 1 || isempty(obj.Tn) == 1 || isempty(obj.Fdata) == 1 ||isempty(obj.fixNod) == 1 || isempty(obj.Tmat) == 1 || isempty(obj.mat) == 1
+                    warning("InputStructure is not filled in")
+                else
+
                 obj.Dimensions()
                 
                 Td = connectDOFs(obj.n_el,obj.n_nod,obj.n_i,obj.Tn);
@@ -81,6 +86,8 @@ classdef SolverStructure < handle
                
                 [obj.eps,obj.sig] = computeStrainStressBar(obj.n_d,obj.n_el,obj.u,Td,obj.x,obj.Tn,obj.mat,obj.Tmat);
                 [obj.FB] = bucklingFailure(obj.mat,obj.Tmat,obj.x,obj.Tn,obj.n_el, obj.sig);
+
+                end
             end
 
             function obj = Represent(obj)

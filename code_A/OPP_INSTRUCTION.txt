@@ -1,0 +1,7 @@
+-TWO POSSIBLE CALSSES:SolverStructureDirect AND SolverStructureIterative
+-FirST---> Create Object
+-SECOND--> Define Material 
+-THIRD---> Define Strcuture
+-FOURHT--> Reprent
+
+Pd: For quick test use the "VarPrueba" workspace
