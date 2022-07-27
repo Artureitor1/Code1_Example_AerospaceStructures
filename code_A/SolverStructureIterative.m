@@ -1,6 +1,4 @@
 classdef SolverStructureIterative < SolverStructure
-    %UNTITLED4 Summary of this class goes here
-    %   Detailed explanation goes here
 
     methods (Access = public, Static)
            function [u,R] = SolveSystem(vL,vR,uR,KG,Fext)

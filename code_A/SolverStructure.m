@@ -1,6 +1,6 @@
 classdef SolverStructure < handle
-    %Father Class
-    %   Detailed explanation goes here
+    % Father Class
+    % This class is not for use! (SolveSystem not implemented)
 
     properties (Access = public)
         % INPUT DATA
@@ -10,7 +10,7 @@ classdef SolverStructure < handle
         thermal_coeff   %[K^-1]
         Inertia         %[m^4]
 
-        %NODES
+        %Nodes
         x              
         Tn
         Fdata
@@ -18,6 +18,9 @@ classdef SolverStructure < handle
         Tmat
         mat
 
+        %Test
+        KG
+        Fext
         %Results
 
         eps
@@ -76,13 +79,13 @@ classdef SolverStructure < handle
                 Kel = computeKelBar(obj.n_d,obj.n_el,obj.n_el_dof,obj.x,obj.Tn,obj.mat,obj.Tmat);
                
                 
-                KG = assemblyKG(obj.n_el,obj.n_el_dof,obj.n_dof,Td,Kel); 
-                Fext = computeF(obj.n_i,obj.n_dof,obj.Fdata);
+                obj.KG = assemblyKG(obj.n_el,obj.n_el_dof,obj.n_dof,Td,Kel); 
+                obj.Fext = computeF(obj.n_i,obj.n_dof,obj.Fdata);
                 
                 [vL,vR,uR] = applyCond(obj.n_i,obj.n_dof,obj.fixNod);
                 
                 
-                [obj.u,obj.R] = obj.SolveSystem(vL,vR,uR,KG,Fext); %This function is defined in the subclasses!!!!
+                [obj.u,obj.R] = obj.SolveSystem(vL,vR,uR,obj.KG,obj.Fext); %This function is defined in the subclasses!!!!
                
                 [obj.eps,obj.sig] = computeStrainStressBar(obj.n_d,obj.n_el,obj.u,Td,obj.x,obj.Tn,obj.mat,obj.Tmat);
                 [obj.FB] = bucklingFailure(obj.mat,obj.Tmat,obj.x,obj.Tn,obj.n_el, obj.sig);
@@ -110,6 +113,11 @@ classdef SolverStructure < handle
                 obj.n_el_dof = obj.n_i*obj.n_nod;         
             end
         end
+        methods (Access = public, Static)
+           function [u,R] = SolveSystem(vL,vR,uR,KG,Fext)
+              error('SolveSystem function not implemented. This class is not for use. Try SolverStructureDirect class or SolverStructureIterative class')
+           end
+    end
 end
 
 
