@@ -15,13 +15,10 @@ classdef SolverStructure < handle
         Tmat
         mat
 
-        KG
-        Fext
 
         eps
         sig
         FB
-        u
         R
 
         n_d             
@@ -34,7 +31,12 @@ classdef SolverStructure < handle
 
         
     end
-
+    properties (Access = public)
+        KG
+        Fext
+        u
+    end
+   
     methods (Access = public)
         function solver(obj,cParams)
             obj.init(cParams);
@@ -43,7 +45,6 @@ classdef SolverStructure < handle
             obj.Represent()
         end  
     end
-
     methods (Access = protected)
 
         function init(obj,cParams)
@@ -77,13 +78,13 @@ classdef SolverStructure < handle
             obj.Inertia         = cParams.Inertia;
         end
         function InputStructure(obj,cParams)
+            obj.Fdata       = cParams.Fdata;
             obj.Fdata(:,3)  = cParams.Fdata(:,3) * obj.F;
-            obj.x       = cParams.x;
-            obj.Tn      = cParams.Tn;
-            obj.Fdata   = cParams.Fdata;
-            obj.fixNod  = cParams.fixNod;
-            obj.Tmat    = cParams.Tmat;
-            obj.mat     = [obj.Young,obj.Area,obj.thermal_coeff,obj.Inertia];
+            obj.x           = cParams.x;
+            obj.Tn          = cParams.Tn;
+            obj.fixNod      = cParams.fixNod;
+            obj.Tmat        = cParams.Tmat;
+            obj.mat         = [obj.Young,obj.Area,obj.thermal_coeff,obj.Inertia];
         end
         function Dimensions(obj)
             obj.n_d = size(obj.x,2);              
@@ -95,7 +96,6 @@ classdef SolverStructure < handle
             obj.n_el_dof = obj.n_i*obj.n_nod; 
         end
     end
-
     methods (Access = protected, Static)
         function Td = connectDOFs(n_el,n_nod,n_i,Tn)
                         Td=zeros(n_el,n_nod*n_i);

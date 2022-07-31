@@ -6,8 +6,8 @@ load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\T
 load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\Test\u_dir.mat')
 load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\Test\u_iter.mat')
 
-%% Create the objefcts
-Test1 = SolverStructureDirect; %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one use.
+%% Create the objects
+Test1 = SolverStructureDirect; %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one is used.
 Test2 = SolverStructureIterative; %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one use.
 
 
@@ -20,14 +20,14 @@ valU_iter   = true;
 
 %% DEFINE PROPERTIES-EXAMPLE
 
-F = 920; %[N]
-Young = 75000e6; %[Pa]
-Area = 120e-6; %[m^2]
-thermal_coeff = 23e-6; %[K^-1]
-Inertia = 1400e-12; %[m^4]
+cParams.F = 920; %[N]
+cParams.Young = 75000e6; %[Pa]
+cParams.Area = 120e-6; %[m^2]
+cParams.thermal_coeff = 23e-6; %[K^-1]
+cParams.Inertia = 1400e-12; %[m^4]
 
 
-x = [
+cParams.x = [
 0 0
 0.5 0.2
 1 0.4
@@ -39,7 +39,7 @@ x = [
 ];
 
 
-Tn = [
+cParams.Tn = [
 1 2
 2 3
 3 4
@@ -58,37 +58,28 @@ Tn = [
 4 8
 ];
 
-Fdata = [
+cParams.Fdata = [
             2 2 3
             3 2 2
             4 2 1
 ];
 
 
-fixNod = [
+cParams.fixNod = [
           1 1 0
           1 2 0
           5 1 0
           5 2 0
 ];
 
-Tmat = [
+cParams.Tmat = [
  1;1;1;1;1;1;1;1;1;1;1;1;1;1;1;1
 ];
 
-%% InputData
-InputData(Test1,F,Young,Area,thermal_coeff,Inertia)
-InputData(Test2,F,Young,Area,thermal_coeff,Inertia)
+%% Start the Solver of the objects
 
-
-%% InputStructure
-InputStructure(Test1,x,Tn,Fdata,fixNod,Tmat)
-InputStructure(Test2,x,Tn,Fdata,fixNod,Tmat)
-
-
-%% SolveStructure
-SolveStructure(Test1)
-SolveStructure(Test2)
+solver(Test1,cParams);
+solver(Test2,cParams);
 
 clc
 %% Validator

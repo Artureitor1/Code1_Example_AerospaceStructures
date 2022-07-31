@@ -1,6 +1,6 @@
 classdef SolverStructureIterative < SolverStructure
 
-    methods (Access = public, Static)
+    methods (Access = protected, Static)
            function [u,R] = SolveSystem(vL,vR,uR,KG,Fext)
                 KLL=KG(vL,vL);
                 KLR=KG(vL,vR);
