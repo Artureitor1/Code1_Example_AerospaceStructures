@@ -27,8 +27,13 @@ classdef SolverStructure < handle
         n_dof           
         n_el            
         n_nod           
-        n_el_dof        
-
+        n_el_dof    
+        
+        Td
+        Kel
+        vL
+        vR
+        uR  
         
     end
     properties (Access = public)
@@ -38,31 +43,25 @@ classdef SolverStructure < handle
     end
    
     methods (Access = public)
-        function solver(obj,cParams)
-            obj.init(cParams);
+        function solver(obj)
+           solveStructure(obj)
         end
-        function Grahps(obj)
+        function Grahpication(obj)
             obj.Represent()
         end  
     end
     methods (Access = protected)
-
-        function init(obj,cParams)
-            obj.InputData(cParams);
-            obj.InputStructure(cParams);
-            obj.SolveStructure();
-        end
         
-        function SolveStructure(obj)
-            obj.Dimensions()
-            Td = obj.connectDOFs(obj.n_el,obj.n_nod,obj.n_i,obj.Tn);
-            Kel = obj.computeKelBar(obj.n_d,obj.n_el,obj.n_el_dof,obj.x,obj.Tn,obj.mat,obj.Tmat);
-            obj.KG = obj.assemblyKG(obj.n_el,obj.n_el_dof,obj.n_dof,Td,Kel); 
-            obj.Fext = obj.computeF(obj.n_i,obj.n_dof,obj.Fdata);
-            [vL,vR,uR] = obj.applyCond(obj.n_i,obj.n_dof,obj.fixNod);
-            [obj.u,obj.R] = obj.SolveSystem(vL,vR,uR,obj.KG,obj.Fext); %This function is defined in the subclasses!!!!
-            [obj.eps,obj.sig] = obj.computeStrainStressBar(obj.n_d,obj.n_el,obj.u,Td,obj.x,obj.Tn,obj.mat,obj.Tmat);
-            [obj.FB] = obj.bucklingFailure(obj.mat,obj.Tmat,obj.x,obj.Tn,obj.n_el, obj.sig);
+        function solveStructure(obj)
+            obj.Dimensions();
+            obj.connectDOFs();
+            obj.computeKelBar();
+            obj.assemblyKG(); 
+            obj.computeF();
+            obj.applyCond();
+            obj.solveSystem(); %This function is defined in the subclasses!!!!
+            obj.computeStrainStressBar();
+            obj.bucklingFailure();
         end
         function Represent(obj)
             obj.plotDisp(obj.n_d,obj.n,obj.u,obj.x,obj.Tn,15);
@@ -70,6 +69,7 @@ classdef SolverStructure < handle
             obj.plotStrainStress(obj.n_d,obj.sig,obj.x,obj.Tn,{'Stress';'(Pa)'});
             obj.plotBarStressDef(obj.x,obj.Tn,obj.u,obj.sig,15)
         end
+        
         function InputData(obj,cParams)
             obj.F               = cParams.F;
             obj.Young           = cParams.Young;
@@ -77,6 +77,7 @@ classdef SolverStructure < handle
             obj.thermal_coeff   = cParams.thermal_coeff;
             obj.Inertia         = cParams.Inertia;
         end
+        
         function InputStructure(obj,cParams)
             obj.Fdata       = cParams.Fdata;
             obj.Fdata(:,3)  = cParams.Fdata(:,3) * obj.F;
@@ -86,6 +87,7 @@ classdef SolverStructure < handle
             obj.Tmat        = cParams.Tmat;
             obj.mat         = [obj.Young,obj.Area,obj.thermal_coeff,obj.Inertia];
         end
+        
         function Dimensions(obj)
             obj.n_d = size(obj.x,2);              
             obj.n_i = obj.n_d;                    
@@ -95,37 +97,36 @@ classdef SolverStructure < handle
             obj.n_nod = size(obj.Tn,2);           
             obj.n_el_dof = obj.n_i*obj.n_nod; 
         end
-    end
-    methods (Access = protected, Static)
-        function Td = connectDOFs(n_el,n_nod,n_i,Tn)
-                        Td=zeros(n_el,n_nod*n_i);
-                        for i=1:n_el
-                           for j=1:n_nod*n_i
+    
+        function connectDOFs (obj)
+                        obj.Td=zeros(obj.n_el,obj.n_nod*obj.n_i);
+                        for i=1:obj.n_el
+                           for j=1:obj.n_nod*obj.n_i
                                if (-1)^j==1
-                                    Td(i,j)=2*Tn(i,j-j/2);
+                                    obj.Td(i,j)=2*obj.Tn(i,j-j/2);
                                end
                                
                                if (-1)^j==-1
-                                    Td(i,j)=2*Tn(i,j-j*(j-1)/(2*j))-1;
+                                    obj.Td(i,j)=2*obj.Tn(i,j-j*(j-1)/(2*j))-1;
                                end
                            end
                         end                        
-                end
-                
-        function Kel = computeKelBar(n_d,n_el,n_el_dof,x,Tn,mat,Tmat)
+        end
+
+        function computeKelBar(obj)
         
-                        Kel=zeros(n_el_dof,n_el_dof,n_el);
-                            for e=1:n_el
-                                x1e=x(Tn(e,1),1);
-                                y1e=x(Tn(e,1),2);
-                                x2e=x(Tn(e,2),1);
-                                y2e=x(Tn(e,2),2);
+                        obj.Kel=zeros(obj.n_el_dof,obj.n_el_dof,obj.n_el);
+                            for e=1:obj.n_el
+                                x1e=obj.x(obj.Tn(e,1),1);
+                                y1e=obj.x(obj.Tn(e,1),2);
+                                x2e=obj.x(obj.Tn(e,2),1);
+                                y2e=obj.x(obj.Tn(e,2),2);
                                 le=sqrt((x2e-x1e)^2+(y2e-y1e)^2);
                                 se=(y2e-y1e)/le;
                                 ce=(x2e-x1e)/le;
                                 
                                 
-                                Ke=(mat(Tmat(e),2))*(mat(Tmat(e),1))/le * [
+                                Ke=(obj.mat(obj.Tmat(e),2))*(obj.mat(obj.Tmat(e),1))/le * [
                                     ce^2 ce*se -(ce)^2 -ce*se
                                     ce*se se^2 -ce*se -(se)^2
                                     -(ce)^2 -ce*se ce^2 ce*se
@@ -133,65 +134,65 @@ classdef SolverStructure < handle
                                 ];
                                 
                                 
-                                Kel(:,:,e) = Ke(:,:);
+                                obj.Kel(:,:,e) = Ke(:,:);
                                 
                             end
                 end
         
-        function KG = assemblyKG(n_el,n_el_dof,n_dof,Td,Kel)
-                    KG=zeros(n_dof,n_dof);
-                            for e=1:n_el
+        function assemblyKG(obj)
+                    obj.KG=zeros(obj.n_dof,obj.n_dof);
+                            for e=1:obj.n_el
                                 for i=1:2*2 
-                                    I=Td(e,i);
+                                    I=obj.Td(e,i);
                                     for j=1:2*2
-                                        J=Td(e,j);
-                                        KG(I,J)=KG(I,J)+Kel(i,j,e);
+                                        J=obj.Td(e,j);
+                                        obj.KG(I,J)=obj.KG(I,J)+obj.Kel(i,j,e);
                                     end
                                 end
                             end
                 end
-                
-        function Fext = computeF(n_i,n_dof,Fdata)
-                    Fext=zeros(n_dof,1); 
-                            for i=1:length(Fdata)
-                                if Fdata(i,2) == 2 % even case
-                                    Fext(Fdata(i,1)*2,1)=Fdata(i,3);
+        
+        function computeF(obj)
+                    obj.Fext=zeros(obj.n_dof,1); 
+                            for i=1:length(obj.Fdata)
+                                if obj.Fdata(i,2) == 2 % even case
+                                    obj.Fext(obj.Fdata(i,1)*2,1)=obj.Fdata(i,3);
                                 else
-                                   Fext((Fdata(i,1)*2)-1,1)=Fdata(i,3); %odd case
+                                   obj.Fext((obj.Fdata(i,1)*2)-1,1)=obj.Fdata(i,3); %odd case
                                 end
                             end
-                end
-        
-        function [vL,vR,uR] = applyCond(n_i,n_dof,fixNod)
-                    uR = zeros(size(fixNod,1),1);
-                    vR = zeros(size(fixNod,1),1);
+         end
+    
+        function applyCond(obj)
+                    obj.uR = zeros(size(obj.fixNod,1),1);
+                    obj.vR = zeros(size(obj.fixNod,1),1);
                     v = linspace(1,16,16);
-                        for i = 1:size(uR,1)
-                            if (fixNod(i,2))== 2
-                                vR(i,1) = 2*fixNod(i,1);
-                                uR(i,1) = fixNod(i,3);
+                        for i = 1:size(obj.uR,1)
+                            if (obj.fixNod(i,2))== 2
+                                obj.vR(i,1) = 2*obj.fixNod(i,1);
+                                obj.uR(i,1) = obj.fixNod(i,3);
                             else
-                                vR(i,1) = 2*(fixNod(i,1))-1;
-                                uR(i,1) = fixNod(i,3);
+                                obj.vR(i,1) = 2*(obj.fixNod(i,1))-1;
+                                obj.uR(i,1) = obj.fixNod(i,3);
                             end
                         end 
-                    vL = transpose (setdiff(v,vR));
+                    obj.vL = transpose (setdiff(v,obj.vR));
                 end
-        
-        function [u,R] = SolveSystem(vL,vR,uR,KG,Fext)
+    
+        function solveSystem(obj)
                    error('SolveSystem function not implemented. This class is not for use. Try SolverStructureDirect class or SolverStructureIterative class')
-                end
-        
-        function [eps,sig] = computeStrainStressBar(n_d,n_el,u,Td,x,Tn,mat,Tmat)
-                            eps=zeros(n_el,1);
-                            sig=zeros(n_el,1);
+        end
+    
+        function computeStrainStressBar(obj)
+                            obj.eps=zeros(obj.n_el,1);
+                            obj.sig=zeros(obj.n_el,1);
                             
-                            for e=1:n_el
+                            for e=1:obj.n_el
                                 ue=zeros(2*2,1);
-                                x1e=x(Tn(e,1),1);
-                                y1e=x(Tn(e,1),2);
-                                x2e=x(Tn(e,2),1);
-                                y2e=x(Tn(e,2),2);
+                                x1e=obj.x(obj.Tn(e,1),1);
+                                y1e=obj.x(obj.Tn(e,1),2);
+                                x2e=obj.x(obj.Tn(e,2),1);
+                                y2e=obj.x(obj.Tn(e,2),2);
                                 le=sqrt((x2e-x1e)^2+(y2e-y1e)^2);
                                 se=(y2e-y1e)/le;
                                 ce=(x2e-x1e)/le;
@@ -200,45 +201,45 @@ classdef SolverStructure < handle
                                     0 0 ce se
                                     0 0 -se ce];
                                 for i=1:2*2
-                                    I=Td(e,i);
-                                    ue(i,1)=u(I);
+                                    I=obj.Td(e,i);
+                                    ue(i,1)=obj.u(I);
                                 end
                                 uep=Re*ue;
-                                eps(e,1)=(1/le)*[-1 0 1 0]*uep;
-                                sig(e,1)=mat(Tmat(e),1)*eps(e,1);
+                                obj.eps(e,1)=(1/le)*[-1 0 1 0]*uep;
+                                obj.sig(e,1)=obj.mat(obj.Tmat(e),1)*obj.eps(e,1);
                             end
                 end
-        
-        function [FB] = bucklingFailure(mat,Tmat,x,Tn,n_el, sig)
-                   FB = zeros(n_el,1); 
-                        for e = 1:n_el
+   
+        function bucklingFailure(obj)
+                   obj.FB = zeros(obj.n_el,1); 
+                        for e = 1:obj.n_el
                     
-                            x1e = x(Tn(e,1),1);
-                            y1e = x(Tn(e,1),2);
-                            x2e = x(Tn(e,2),1);
-                            y2e = x(Tn(e,2),2);
+                            x1e = obj.x(obj.Tn(e,1),1);
+                            y1e = obj.x(obj.Tn(e,1),2);
+                            x2e = obj.x(obj.Tn(e,2),1);
+                            y2e = obj.x(obj.Tn(e,2),2);
                             L = sqrt((x2e-x1e)^2+(y2e-y1e)^2);
                     
-                            E = mat(Tmat(e),1);
-                            I = mat(Tmat(e),4);
-                            A = mat(Tmat(e),2);
+                            E = obj.mat(obj.Tmat(e),1);
+                            I = obj.mat(obj.Tmat(e),4);
+                            A = obj.mat(obj.Tmat(e),2);
                     
                             sigPan = ((pi^2)*E*I)/((L^2)*A); 
                             
-                            if sig(e)<-1
-                                if abs(sig(e)) > sigPan
-                                    FB(e) = 1; 
+                            if obj.sig(e)<-1
+                                if abs(obj.sig(e)) > sigPan
+                                    obj.FB(e) = 1; 
                                 end
                             end
                         end
                 end
     
-        function plotStrainStress(n_d,s,x,Tn,title_name)
+        function plotStrainStress(obj)
 
-                for i = 1:n_d
-                    X0{i} = reshape(x(Tn,i),size(Tn))';
+                for i = 1:obj.n_d
+                    X0{i} = reshape(obj.x(obj.Tn,i),size(Tobj.n))';
                 end
-                S = repmat(s',size(Tn,2),1);
+                S = repmat(obj.s',size(obj.Tn,2),1);
                 
                 figure('color','w');
                 hold on;       
@@ -248,24 +249,24 @@ classdef SolverStructure < handle
                 
                 xlabel('x (m)')
                 ylabel('y (m)')
-                title(title_name{1});
+                title(obj.title_name{1});
                 
                 patch(X0{:},S,'edgecolor','flat','linewidth',2);
                 
                 caxis([min(S(:)),max(S(:))]);
                 cbar = colorbar;
                 set(cbar,'Ticks',linspace(min(S(:)),max(S(:)),5));
-                title(cbar,title_name);
+                title(cbar,obj.title_name);
         end
     
-        function plotDisp(n_d,n,u,x,Tn,fact)
+        function plotDisp(obj)
 
-                U = reshape(u,n_d,n);
-                for i = 1:n_d
-                    X0{i} = reshape(x(Tn,i),size(Tn))';
-                    X{i} = X0{i}+fact*reshape(U(i,Tn),size(Tn))';
+                U = reshape(obj.u,obj.n_d,obj.n);
+                for i = 1:obj.n_d
+                    X0{i} = reshape(obj.x(obj.Tn,i),size(obj.Tn))';
+                    X{i} = X0{i}+obj.fact*reshape(U(i,obj.Tn),size(obj.Tn))';
                 end
-                D = reshape(sqrt(sum(U(:,Tn).^2,1)),size(Tn))';
+                D = reshape(sqrt(sum(U(:,obj.Tn).^2,1)),size(obj.Tn))';
                 
                 figure('color','w');
                 hold on;       
@@ -286,12 +287,12 @@ classdef SolverStructure < handle
                 set(cbar,'Ticks',linspace(min(D(:)),max(D(:)),5))
                 end
     
-        function plotBarStressDef(x,Tn,u,sig,scale)
-                n_d = size(x,2);
-                X = x(:,1);
-                Y = x(:,2);
-                ux = u(1:n_d:end);
-                uy = u(2:n_d:end);
+        function plotBarStressDef(obj)
+                n_d = size(obj.x,2);
+                X = obj.x(:,1);
+                Y = obj.x(:,2);
+                ux = obj.u(1:n_d:end);
+                uy = obj.u(2:n_d:end);
                 
                 figure('color','w');
                 hold on
@@ -299,21 +300,24 @@ classdef SolverStructure < handle
                 axis equal;
                 colormap jet;
                 
-                plot(X(Tn)',Y(Tn)','-k','linewidth',0.5);
+                plot(X(obj.Tn)',Y(obj.Tn)','-k','linewidth',0.5);
                 
-                patch(X(Tn)'+scale*ux(Tn)',Y(Tn)'+scale*uy(Tn)',[sig';sig'],'edgecolor','flat','linewidth',2);
+                patch(X(obj.Tn)'+obj.scale*ux(obj.Tn)',Y(obj.Tn)'+obj.scale*uy(obj.Tn)',[obj.sig';obj.sig'],'edgecolor','flat','linewidth',2);
                 
                 xlabel('x (m)')
                 ylabel('y (m)')
                 
-                title(sprintf('Deformed structure (scale = %g)',scale));
+                title(sprintf('Deformed structure (scale = %g)',obj.scale));
                 
-                caxis([min(sig(:)),max(sig(:))]);
+                caxis([min(obj.sig(:)),max(obj.sig(:))]);
                 cbar = colorbar;
-                set(cbar,'Ticks',linspace(min(sig(:)),max(sig(:)),5));
+                set(cbar,'Ticks',linspace(min(obj.sig(:)),max(obj.sig(:)),5));
                 title(cbar,{'Stress';'(Pa)'});
                 
         end
-    end   
+    end
+  
 end
+
+
 

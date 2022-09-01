@@ -1,21 +1,29 @@
 classdef SolverStructureDirect < SolverStructure
-    methods (Access = protected, Static)
-           function [u,R] = SolveSystem(vL,vR,uR,KG,Fext)
-                KLL=KG(vL,vL);
-                KLR=KG(vL,vR);
-                KRL=KG(vR,vL);
-                KRR=KG(vR,vR);
-                FextL=Fext(vL,1);
-                FextR=Fext(vR,1);
 
-                uL=KLL\(FextL-KLR*uR);
-                RR=KRR*uR+KRL*uL-FextR;
-                
-                u(vL,1)=uL;
-                u(vR,1)=uR;
-                
-                R(vL,1) = 0;
-                R(vR,1) = RR;
-            end
+    methods (Access = public)
+           function obj = SolverStructureDirect(cParams)
+                obj.InputData(cParams);
+                obj.InputStructure(cParams);
+           end
+    end 
+    
+    methods (Access = protected)
+        function solveSystem(obj)
+                    KLL=obj.KG(obj.vL,obj.vL);
+                    KLR=obj.KG(obj.vL,obj.vR);
+                    KRL=obj.KG(obj.vR,obj.vL);
+                    KRR=obj.KG(obj.vR,obj.vR);
+                    FextL=obj.Fext(obj.vL,1);
+                    FextR=obj.Fext(obj.vR,1);
+    
+                    uL=KLL\(FextL-KLR*obj.uR);
+                    RR=KRR*obj.uR+KRL*uL-FextR;
+                    
+                    obj.u(obj.vL,1)=uL;
+                    obj.u(obj.vR,1)=obj.uR;
+                    
+                    obj.R(obj.vL,1) = 0;
+                    obj.R(obj.vR,1) = RR;
+        end
     end
 end
