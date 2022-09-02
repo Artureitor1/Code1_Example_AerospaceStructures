@@ -8,16 +8,11 @@ classdef SolverStructureDirect < SolverStructure
     end 
     
     methods (Access = protected)
+
         function solveSystem(obj)
-                    KLL=obj.KG(obj.vL,obj.vL);
-                    KLR=obj.KG(obj.vL,obj.vR);
-                    KRL=obj.KG(obj.vR,obj.vL);
-                    KRR=obj.KG(obj.vR,obj.vR);
-                    FextL=obj.Fext(obj.vL,1);
-                    FextR=obj.Fext(obj.vR,1);
     
-                    uL=KLL\(FextL-KLR*obj.uR);
-                    RR=KRR*obj.uR+KRL*uL-FextR;
+                    uL=(obj.KLL)\(obj.FextL-obj.KLR*obj.uR);
+                    RR=obj.KRR*obj.uR+obj.KRL*uL-obj.FextR;
                     
                     obj.u(obj.vL,1)=uL;
                     obj.u(obj.vR,1)=obj.uR;

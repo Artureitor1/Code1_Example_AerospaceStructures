@@ -31,15 +31,26 @@ classdef SolverStructure < handle
         
         Td
         Kel
-        vL
+        
         vR
-        uR  
+        vL  
+
+        KLL
+
+        KRL
+        KRR
+        uR
+        KLR
+        FextL
+        FextR
         
     end
     properties (Access = public)
         KG
         Fext
         u
+        
+        
     end
    
     methods (Access = public)
@@ -59,6 +70,7 @@ classdef SolverStructure < handle
             obj.assemblyKG(); 
             obj.computeF();
             obj.applyCond();
+            obj.constructSystem()
             obj.solveSystem(); %This function is defined in the subclasses!!!!
             obj.computeStrainStressBar();
             obj.bucklingFailure();
@@ -150,7 +162,7 @@ classdef SolverStructure < handle
                                     end
                                 end
                             end
-                end
+         end
         
         function computeF(obj)
                     obj.Fext=zeros(obj.n_dof,1); 
@@ -177,7 +189,17 @@ classdef SolverStructure < handle
                             end
                         end 
                     obj.vL = transpose (setdiff(v,obj.vR));
-                end
+        end
+        
+        function constructSystem(obj)
+                    obj.KLL=obj.KG(obj.vL,obj.vL);
+                    obj.KLR=obj.KG(obj.vL,obj.vR);
+                    obj.KRL=obj.KG(obj.vR,obj.vL);
+                    obj.KRR=obj.KG(obj.vR,obj.vR);
+                    obj.FextL=obj.Fext(obj.vL,1);
+                    obj.FextR=obj.Fext(obj.vR,1);
+   
+        end
     
         function solveSystem(obj)
                    error('SolveSystem function not implemented. This class is not for use. Try SolverStructureDirect class or SolverStructureIterative class')
