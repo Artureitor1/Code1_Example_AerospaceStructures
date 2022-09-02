@@ -46,14 +46,14 @@ classdef SolverStructure < handle
         function solver(obj)
            solveStructure(obj)
         end
-        function Grahpication(obj)
-            obj.Represent()
+        function grahp(obj)
+            obj.represent()
         end  
     end
     methods (Access = protected)
         
         function solveStructure(obj)
-            obj.Dimensions();
+            obj.dimensions();
             obj.connectDOFs();
             obj.computeKelBar();
             obj.assemblyKG(); 
@@ -63,14 +63,14 @@ classdef SolverStructure < handle
             obj.computeStrainStressBar();
             obj.bucklingFailure();
         end
-        function Represent(obj)
+        function represent(obj)
             obj.plotDisp(obj.n_d,obj.n,obj.u,obj.x,obj.Tn,15);
             obj.plotStrainStress(obj.n_d,obj.eps,obj.x,obj.Tn,{'Strain'});
             obj.plotStrainStress(obj.n_d,obj.sig,obj.x,obj.Tn,{'Stress';'(Pa)'});
             obj.plotBarStressDef(obj.x,obj.Tn,obj.u,obj.sig,15)
         end
         
-        function InputData(obj,cParams)
+        function inputData(obj,cParams)
             obj.F               = cParams.F;
             obj.Young           = cParams.Young;
             obj.Area            = cParams.Area;
@@ -78,7 +78,7 @@ classdef SolverStructure < handle
             obj.Inertia         = cParams.Inertia;
         end
         
-        function InputStructure(obj,cParams)
+        function inputStructure(obj,cParams)
             obj.Fdata       = cParams.Fdata;
             obj.Fdata(:,3)  = cParams.Fdata(:,3) * obj.F;
             obj.x           = cParams.x;
@@ -88,7 +88,7 @@ classdef SolverStructure < handle
             obj.mat         = [obj.Young,obj.Area,obj.thermal_coeff,obj.Inertia];
         end
         
-        function Dimensions(obj)
+        function dimensions(obj)
             obj.n_d = size(obj.x,2);              
             obj.n_i = obj.n_d;                    
             obj.n = size(obj.x,1);                

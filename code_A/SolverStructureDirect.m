@@ -2,8 +2,8 @@ classdef SolverStructureDirect < SolverStructure
 
     methods (Access = public)
            function obj = SolverStructureDirect(cParams)
-                obj.InputData(cParams);
-                obj.InputStructure(cParams);
+                obj.inputData(cParams);
+                obj.inputStructure(cParams);
            end
     end 
     

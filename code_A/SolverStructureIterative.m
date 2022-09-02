@@ -3,8 +3,8 @@ classdef SolverStructureIterative < SolverStructure
 
     methods  (Access = public)
             function obj = SolverStructureIterative(cParams)
-                obj.InputData(cParams);
-                obj.InputStructure(cParams);
+                obj.inputData(cParams);
+                obj.inputStructure(cParams);
             end
     end
     methods (Access = protected)
