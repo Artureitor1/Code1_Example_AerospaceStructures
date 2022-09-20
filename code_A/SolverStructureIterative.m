@@ -9,7 +9,8 @@ classdef SolverStructureIterative < SolverStructure
     end
     methods (Access = protected)
            function solveSystem(obj)
-                
+
+
                 uL = pcg(obj.KLL,(obj.FextL-obj.KLR*obj.uR));
                 RR=obj.KRR*obj.uR+obj.KRL*uL-obj.FextR;
                 

@@ -10,7 +10,7 @@ classdef SolverStructureDirect < SolverStructure
     methods (Access = protected)
 
         function solveSystem(obj)
-    
+                    
                     uL=(obj.KLL)\(obj.FextL-obj.KLR*obj.uR);
                     RR=obj.KRR*obj.uR+obj.KRL*uL-obj.FextR;
                     
