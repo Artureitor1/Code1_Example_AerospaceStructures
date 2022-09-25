@@ -1,15 +1,19 @@
-classdef SolverStructure < handle
+classdef computeStructure < handle
 
     properties (Access = protected)
-     
+        
+        x              
+        Tn
+
         F              
         Young           
         Area            
         thermalCoeff   
-        Inertia         
+        Inertia   
+        method 
 
-        x              
-        Tn
+
+
         Fdata
         fixNod
         Tmat
@@ -27,8 +31,10 @@ classdef SolverStructure < handle
         nDof           
         nEl            
         nNod           
-        nElDof    
-        
+        nElDof
+
+
+
         
         Kel
         
@@ -38,6 +44,7 @@ classdef SolverStructure < handle
         
     end
     properties (Access = public)
+
         KG
         Fext
         u
@@ -55,14 +62,38 @@ classdef SolverStructure < handle
     end
    
     methods (Access = public)
-        function solver(obj)
-           solveStructure(obj)
+        function obj = computeStructure(cParams)
+            obj.init(cParams);
+        end 
+        function compute(obj)
+           obj.solveStructure()
         end
         function grahp(obj)
             obj.represent()
         end  
     end
     methods (Access = protected)
+        function init(obj,cParams)
+            obj.inputData(cParams);
+            obj.inputStructure(cParams);
+        end
+        function inputData(obj,cParams)
+            obj.F               = cParams.F;
+            obj.Young           = cParams.Young;
+            obj.Area            = cParams.Area;
+            obj.thermalCoeff    = cParams.thermal_coeff;
+            obj.Inertia         = cParams.Inertia;
+            obj.method         =  cParams.method;
+        end
+        function inputStructure(obj,cParams)
+            obj.Fdata       = cParams.Fdata;
+            obj.Fdata(:,3)  = cParams.Fdata(:,3) * obj.F;
+            obj.x           = cParams.x;
+            obj.Tn          = cParams.Tn;
+            obj.fixNod      = cParams.fixNod;
+            obj.Tmat        = cParams.Tmat;
+            obj.mat         = [obj.Young,obj.Area,obj.thermalCoeff,obj.Inertia];
+        end
         
         function solveStructure(obj)
             obj.dimensions();
@@ -73,27 +104,11 @@ classdef SolverStructure < handle
             obj.computeStrainStressBar();
             obj.bucklingFailure();
         end
+
         function represent(obj)
-            obj.plot();
+            obj.ploter();
         end
-        
-        function inputData(obj,cParams)
-            obj.F               = cParams.F;
-            obj.Young           = cParams.Young;
-            obj.Area            = cParams.Area;
-            obj.thermalCoeff    = cParams.thermal_coeff;
-            obj.Inertia         = cParams.Inertia;
-        end
-        
-        function inputStructure(obj,cParams)
-            obj.Fdata       = cParams.Fdata;
-            obj.Fdata(:,3)  = cParams.Fdata(:,3) * obj.F;
-            obj.x           = cParams.x;
-            obj.Tn          = cParams.Tn;
-            obj.fixNod      = cParams.fixNod;
-            obj.Tmat        = cParams.Tmat;
-            obj.mat         = [obj.Young,obj.Area,obj.thermalCoeff,obj.Inertia];
-        end
+       
         
         function dimensions(obj)
 
@@ -108,7 +123,7 @@ classdef SolverStructure < handle
             obj.nDof = B.nDof;
             obj.nEl  = B.nEl;
             obj.nNod   = B.nNod;
-            obj.nElDof = B.nElDof;
+            obj.nElDof = B.nElDof
 
         end
     
@@ -161,7 +176,22 @@ classdef SolverStructure < handle
             
         end
         function solveSystem(obj)
-                   error('SolveSystem function not implemented. This class is not for use. Try SolverStructureDirect class or SolverStructureIterative class')
+            %error('SolveSystem function not implemented. This class is not for use. Try SolverStructureDirect class or SolverStructureIterative class')
+            s.method = obj.method;
+            s.KLL = obj.KLL;
+            s.KRL = obj.KRL;
+            s.KLR = obj.KLR;
+            s.KRR = obj.KRR;
+            s.FextL = obj.FextL;
+            s.FextR = obj.FextR;
+            s.uR = obj.uR;
+            s.vL = obj.vL;
+            s.vR = obj.vR;
+            B = solverMethodCompute(s);
+            B.compute()
+            obj.u = B.u;
+            obj.R = B.R;
+
         end
     
         function computeStrainStressBar(obj)
@@ -184,12 +214,13 @@ classdef SolverStructure < handle
             s.Tn = obj.Tn;
             s.mat = obj.mat;
             s.Tmat = obj.Tmat;
-            B = bucklingFailureCompute(s)
+            s.sig = obj.sig;
+            B = bucklingFailureCompute(s);
             B.compute()
             obj.FB;
         end
     
-        function plot(obj)
+        function ploter(obj)
             s.Tn = obj.Tn;
             s.n =obj.n;
             s.x =obj.x;
@@ -202,6 +233,5 @@ classdef SolverStructure < handle
     end
   
 end
-
 
 

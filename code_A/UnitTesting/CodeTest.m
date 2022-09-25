@@ -13,9 +13,15 @@ load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\T
 %% Load the workspace of the example properties
 load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\Test\cParams.mat')
 
+
 %% Create the objects
-Test1 = SolverStructureDirect(cParams); %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one is used.
-Test2 = SolverStructureIterative(cParams); %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one use.
+cParams.method  = "direct";
+Test1 = computeStructure(cParams);
+cParams.method  = "iterative";
+Test2 = computeStructure(cParams);
+
+%Test1 = SolverStructureDirect(cParams); %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one is used.
+%Test2 = SolverStructureIterative(cParams); %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one use.
 
 %% Check in Validation
 
@@ -26,8 +32,8 @@ valU_iter   = true;
 
 %% Start the Solver of the objects
 
-solver(Test1);
-solver(Test2);
+Test1.compute();
+Test2.compute();
 
 clc
 %% Validator

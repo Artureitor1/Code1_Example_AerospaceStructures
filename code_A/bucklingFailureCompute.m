@@ -5,13 +5,14 @@ classdef bucklingFailureCompute < handle
         Tn
         mat
         Tmat
+        sig
     end
     properties (Access = public)
         FB
     end 
     methods (Access = public)
-        function obj = bucklingFailureCompute(obj,cParams)
-            obj.init()
+        function obj = bucklingFailureCompute(cParams)
+            obj.init(cParams)
         end
 
         function compute(obj)
@@ -19,7 +20,14 @@ classdef bucklingFailureCompute < handle
         end
     end
     methods  (Access = private)
-        function init(obj)
+        function init(obj,cParams)
+            obj.nEl = cParams.nEl;
+            obj.x = cParams.x;
+            obj.Tn = cParams.Tn;
+            obj.mat = cParams.mat;
+            obj.Tmat = cParams.Tmat;
+            obj.sig = cParams.sig;
+
         end
         function buckling(obj)
             obj.FB = zeros(obj.nEl,1);

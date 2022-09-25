@@ -1,13 +1,44 @@
-classdef SolverStructureDirect < SolverStructure
+classdef SolverStructureDirect < handle
+    properties (Access = private)
+            KLL
+            KRL
+            KLR
+            KRR
 
-    methods (Access = public)
-           function obj = SolverStructureDirect(cParams)
-                obj.inputData(cParams);
-                obj.inputStructure(cParams);
-           end
+           FextL
+           FextR
+
+           uR
+           vL
+           vR
     end 
+    properties (Access = public)
+        u
+        R
+    end
+    methods (Access = public)
+        function obj = SolverStructureDirect(cParams)
+            obj.init(cParams);
+        end
+        function compute(obj)
+            obj.solveSystem();
+        end
+    end
     
     methods (Access = protected)
+        function init(obj,cParams)
+            obj.KLL =cParams.KLL;
+            obj.KRL =cParams.KRL;
+            obj.KLR =cParams.KLR;
+            obj.KRR =cParams.KRR;
+
+            obj.FextL =cParams.FextL;
+            obj.FextR =cParams.FextR;
+
+            obj.uR =cParams.uR;
+            obj.vL =cParams.vL;
+            obj.vR =cParams.vR;
+        end
 
         function solveSystem(obj)
                     
