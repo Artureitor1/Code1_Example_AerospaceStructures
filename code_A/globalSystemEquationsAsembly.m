@@ -1,4 +1,4 @@
-classdef globalSystemEquationsAsembler < handle
+classdef globalSystemEquationsAsembly < handle
 
     properties (Access = public)
         Fext
@@ -22,7 +22,7 @@ classdef globalSystemEquationsAsembler < handle
     end 
 
     methods (Access = public)
-        function obj = globalSystemEquationsAsembler(cParams)
+        function obj = globalSystemEquationsAsembly(cParams)
             obj.init(cParams)
         end
         function compute(obj)           

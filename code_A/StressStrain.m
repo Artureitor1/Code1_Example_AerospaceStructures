@@ -43,7 +43,7 @@ classdef StressStrain < handle
                 s.x = obj.x;
                 s.Tn = obj.Tn;
                 s.e = e;
-                B = matrixRotationAsembler(s);
+                B = matrixRotationCompute(s);
                 B.compute()
                 le   = B.le;
                 Re = B.Re;

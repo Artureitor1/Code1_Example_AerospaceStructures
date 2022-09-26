@@ -1,4 +1,4 @@
-classdef dispPlotter < handle
+classdef dispPlotterCompute < handle
     properties (Access = private)
         nd
         Tn
@@ -8,7 +8,7 @@ classdef dispPlotter < handle
     end
 
     methods (Access = public )
-        function obj = dispPlotter(cParams)
+        function obj = dispPlotterCompute(cParams)
             obj.init(cParams)
         end
 

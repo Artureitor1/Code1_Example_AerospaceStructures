@@ -32,6 +32,14 @@ classdef computeStructure < handle
         nEl            
         nNod           
         nElDof
+        
+        KLL
+        KRL
+        KRR
+        uR
+        KLR
+        FextL
+        FextR
 
 
 
@@ -49,16 +57,6 @@ classdef computeStructure < handle
         Fext
         u
         Td
-        
-        KLL
-        KRL
-        KRR
-        uR
-        KLR
-        FextL
-        FextR
-        
-        
     end
    
     methods (Access = public)
@@ -123,7 +121,7 @@ classdef computeStructure < handle
             obj.nDof = B.nDof;
             obj.nEl  = B.nEl;
             obj.nNod   = B.nNod;
-            obj.nElDof = B.nElDof
+            obj.nElDof = B.nElDof;
 
         end
     
@@ -136,7 +134,7 @@ classdef computeStructure < handle
             s.Tmat   = obj.Tmat;
             s.mat    = obj.mat;
             s.nElDof = obj.nElDof;
-            B        = StifnessMatriz(s);
+            B        = stifnessMatrix(s);
             B.compute();
             obj.Td   = B.Td;
             obj.Kel  = B.Kel; 
@@ -159,7 +157,7 @@ classdef computeStructure < handle
             s.nDof   = obj.nDof;
             s.fixNod = obj.fixNod;
             s.KG     = obj.KG;
-            B = globalSystemEquationsAsembler(s);
+            B = globalSystemEquationsAsembly(s);
             B.compute()
 
             obj.uR = B.uR;
@@ -176,7 +174,6 @@ classdef computeStructure < handle
             
         end
         function solveSystem(obj)
-            %error('SolveSystem function not implemented. This class is not for use. Try SolverStructureDirect class or SolverStructureIterative class')
             s.method = obj.method;
             s.KLL = obj.KLL;
             s.KRL = obj.KRL;
@@ -227,7 +224,7 @@ classdef computeStructure < handle
             s.nd =obj.nd;
             s.u =obj.u;
             s.sig =obj.sig;
-            B = plot(s);
+            B = plotCompute(s);
             B.compute();
         end
     end

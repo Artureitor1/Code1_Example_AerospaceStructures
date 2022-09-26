@@ -1,4 +1,4 @@
-classdef plot < handle
+classdef plotCompute < handle
     properties (Access = private)
         Tn
         n
@@ -10,7 +10,7 @@ classdef plot < handle
     end
 
     methods (Access = public)
-        function obj = plot(cParams)
+        function obj = plotCompute(cParams)
             obj.init(cParams)
         end
 
@@ -19,6 +19,7 @@ classdef plot < handle
         end
     end
     methods (Access = private)
+
         function init(obj,cParams)
             obj.Tn = cParams.Tn;
             obj.n =cParams.n;
@@ -27,12 +28,17 @@ classdef plot < handle
             obj.u =cParams.u;
             obj.sig =cParams.sig;
         end
+        function plot(obj)
+            obj.strainStressPlotter();
+            obj.dispPlotter();
+            obj.plotBarStressDef();
+        end
         function strainStressPlotter(obj)
             s.nd = obj.nd;
             s.Tn =obj.Tn;
             s.n =obj.n;
             s.x =obj.x;
-            B = strainStressPlotter(s);
+            B = strainStressPlotCompute(s);
             B.compute()
 
 
@@ -43,7 +49,7 @@ classdef plot < handle
             s.n  = obj.n;
             s.x  = obj.x;
             s.u  = obj.u;
-            B = dispPlotter(s);
+            B = dispPloterCompute(s);
             B.compute()
 
         end
@@ -52,7 +58,7 @@ classdef plot < handle
             s.u = obj.u;
             s.Tn = obj.Tn;
             s.sig = obj.sig;
-            B = plotBarStressDef(s);
+            B = plotBarStressDefCompute(s);
             B.compute()
 
         end

@@ -1,4 +1,4 @@
-classdef strainStressPlotter < handle
+classdef strainStressPlotCompute < handle
     properties (Access = private)
         nd
         Tn
@@ -7,7 +7,7 @@ classdef strainStressPlotter < handle
     end
 
     methods (Access = public )
-        function obj = strainStressPlotter(cParams)
+        function obj = strainStressPlotCompute(cParams)
             obj.init(cParams)
         end
 

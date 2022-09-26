@@ -1,4 +1,4 @@
-classdef plotBarStressDef < handle
+classdef plotBarStressDefCompute < handle
     properties (Access = private)
         x
         u
@@ -7,7 +7,7 @@ classdef plotBarStressDef < handle
     end
 
     methods (Access = public)
-        function obj = plotBarStressDef(cParams)
+        function obj = plotBarStressDefCompute(cParams)
             obj.init(cParams)
         end
 

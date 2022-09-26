@@ -1,9 +1,9 @@
 classdef SolverStructureDirect < handle
     properties (Access = private)
-            KLL
-            KRL
-            KLR
-            KRR
+           KLL
+           KRL
+           KLR
+           KRR
 
            FextL
            FextR
