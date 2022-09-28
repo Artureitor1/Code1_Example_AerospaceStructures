@@ -42,7 +42,12 @@ classdef SolverStructureDirect < handle
 
         function solveSystem(obj)
                     
-                    uL=(obj.KLL)\(obj.FextL-obj.KLR*obj.uR);
+                    s.A = obj.KLL;
+                    s.B = obj.FextL-obj.KLR*obj.uR;
+                    B = directSolveSystem(s)
+                    B.compute();
+                    uL = B.C;
+
                     RR=obj.KRR*obj.uR+obj.KRL*uL-obj.FextR;
                     
                     obj.u(obj.vL,1)=uL;
