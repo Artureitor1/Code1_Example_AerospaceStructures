@@ -1,4 +1,4 @@
-classdef stifnessMatrix < handle
+classdef stifnessMatrixComputer < handle
     properties (Access = private)
         nEl
         nNod
@@ -16,7 +16,7 @@ classdef stifnessMatrix < handle
     end
 
     methods (Access = public)
-        function obj = stifnessMatrix(cParams)
+        function obj = stifnessMatrixComputer(cParams)
             obj.init(cParams);
         end
 
@@ -54,7 +54,6 @@ classdef stifnessMatrix < handle
                     end
                 end
             end
-            obj.Td
         end
         function computeKelBar(obj)
             obj.Kel=zeros(obj.nElDof,obj.nElDof,obj.nEl);

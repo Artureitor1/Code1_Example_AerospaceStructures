@@ -1,5 +1,4 @@
-classdef assemblyGloblaStiffnessMatrix < handle
-    
+classdef KGcomputer < handle
     properties (Access = private)
         nDof
         nEl
@@ -11,12 +10,12 @@ classdef assemblyGloblaStiffnessMatrix < handle
     end
 
     methods (Access = public)
-        function obj = assemblyGloblaStiffnessMatrix(cParams)
+        function obj = KGcomputer(cParams)
             obj.init(cParams);
         end
 
         function compute(obj)
-            obj.assemblyKG()
+            obj.computeKG()
         end
     end
 
@@ -27,7 +26,7 @@ classdef assemblyGloblaStiffnessMatrix < handle
             obj.Td   = cParams.Td;
             obj.Kel  = cParams.Kel;        
         end
-        function assemblyKG(obj)
+        function computeKG(obj)
             obj.KG=zeros(obj.nDof,obj.nDof);
             for e=1:obj.nEl
                 for i=1:2*2

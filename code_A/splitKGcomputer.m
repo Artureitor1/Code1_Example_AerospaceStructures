@@ -1,11 +1,6 @@
-classdef systemAsembler < handle
+classdef splitKGcomputer < handle
+    properties (Access = private)
 
-    properties (Access = public)
-        KG
-        vL
-        vR
-        Fext
-        
     end
     properties (Access = public)
         KLL
@@ -14,31 +9,36 @@ classdef systemAsembler < handle
         KRR
         FextR
         FextL
+
+        KG
+        vL
+        vR
+        Fext
     end 
 
     methods (Access = public)
-        function obj = systemAsembler(cParams)
+        function obj = splitKGcomputer(cParams)
             obj.init(cParams);
         end
+
         function compute(obj)
-            obj.constructSystem()
+            obj.split();
         end
     end
-    methods  (Access = protected)
-        function init(obj,cParams)
-            obj.KG   = cParams.KG;
-            obj.vL   = cParams.vL;
-            obj.vR   = cParams.vR;
+    methods (Access = private)
+        function init (obj,cParams)
             obj.Fext = cParams.Fext;
+            obj.KG = cParams.KG;
+            obj.vL = cParams.vL;
+            obj.vR = cParams.vR;
         end
-
-        function constructSystem(obj)
+        function split(obj)
             obj.KLL=obj.KG(obj.vL,obj.vL);
             obj.KLR=obj.KG(obj.vL,obj.vR);
             obj.KRL=obj.KG(obj.vR,obj.vL);
             obj.KRR=obj.KG(obj.vR,obj.vR);
             obj.FextL=obj.Fext(obj.vL,1);
             obj.FextR=obj.Fext(obj.vR,1);
-        end
-    end
+        end 
+    end 
 end

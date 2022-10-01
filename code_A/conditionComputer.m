@@ -1,4 +1,4 @@
-classdef conditionAsembler < handle
+classdef conditionComputer < handle
     properties (Access = public)
         uR
         vR
@@ -6,10 +6,11 @@ classdef conditionAsembler < handle
     end
     properties (Access = private)
         fixNod
+        
     end 
 
     methods (Access = public)
-        function obj = conditionAsembler(cParams)
+        function obj = conditionComputer(cParams)
             obj.init(cParams);
         end
 

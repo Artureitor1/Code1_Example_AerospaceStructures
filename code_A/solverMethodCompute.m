@@ -11,7 +11,6 @@ classdef solverMethodCompute < handle
         
         uR
         vL
-        
         vR
         
     end

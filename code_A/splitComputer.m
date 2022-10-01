@@ -1,7 +1,7 @@
-classdef globalSystemEquationsAsembly < handle
+classdef splitComputer < handle
 
     properties (Access = public)
-        Fext
+        
 
         uR
         vR
@@ -15,40 +15,32 @@ classdef globalSystemEquationsAsembly < handle
         FextL
     end
     properties (Access = private)
-        Fdata
+        
+        Fext
         nDof
         fixNod
         KG
     end 
 
     methods (Access = public)
-        function obj = globalSystemEquationsAsembly(cParams)
+        function obj = splitComputer(cParams)
             obj.init(cParams)
         end
         function compute(obj)           
-            obj.forceAsembler()
             obj.conditionAsembler()
             obj.systemAsembler()
         end
     end
     methods (Access = private)
         function init(obj,cParams)
-            obj.Fdata = cParams.Fdata;
-            obj.nDof  = cParams.nDof;
             obj.fixNod = cParams.fixNod;
             obj.KG = cParams.KG;
+            obj.Fext = cParams.Fext;
             
-        end 
-        function forceAsembler(obj)
-            s.nDof = obj.nDof;
-            s.Fdata = obj.Fdata;
-            B = forceAsembler(s);
-            B.compute()
-            obj.Fext = B.Fext;
         end 
         function conditionAsembler(obj)
             s.fixNod = obj.fixNod;
-            B = conditionAsembler(s);
+            B = conditionComputer(s);
             B.compute()
             obj.uR = B.uR;
             obj.vR = B.vR;
@@ -60,7 +52,7 @@ classdef globalSystemEquationsAsembly < handle
             s.vL    = obj.vL;
             s.vR    = obj.vR;
             s.Fext  = obj.Fext;
-            B = systemAsembler(s);
+            B = splitKGcomputer(s);
             B.compute()
             obj.KLL = B.KLL;
             obj.KLR = B.KLR;
