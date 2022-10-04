@@ -1,4 +1,4 @@
-classdef StressStrain < handle
+classdef stressStrainComputer < handle
 
     properties (Access = private)
         nEl 
@@ -15,25 +15,32 @@ classdef StressStrain < handle
     end 
 
     methods (Access = public)
-        function obj = StressStrain(cParams)
+        function obj = stressStrainComputer(cParams)
                 obj.init(cParams);
         end
 
         function compute(obj)
-            obj.StresStrain()
+            obj.computeGeometry()
+            obj.computeStresStrain()
         end
     end
     methods (Access = private)
         function init(obj,cParams)
-            obj.nEl = cParams.nEl;
             obj.Tn =  cParams.Tn;
             obj.x =   cParams.x;
             obj.mat = cParams.mat;
             obj.Tmat = cParams.Tmat;  
-            obj.Td = cParams.Td;
             obj.u = cParams.u;
         end 
-        function StresStrain(obj)
+        function computeGeometry(obj)
+            s.x  = obj.x;
+            s.Tn = obj.Tn;
+            B = geometryComputer(s);
+            B.compute();
+            obj.nEl = B.nEl;
+            obj.Td = B.Td;
+        end 
+        function computeStresStrain(obj)
             obj.eps=zeros(obj.nEl,1);
             obj.sig=zeros(obj.nEl,1);
 
@@ -43,7 +50,7 @@ classdef StressStrain < handle
                 s.x = obj.x;
                 s.Tn = obj.Tn;
                 s.e = e;
-                B = matrixRotationCompute(s);
+                B = matrixRotationComputer(s);
                 B.compute()
                 le   = B.le;
                 Re = B.Re;

@@ -1,4 +1,4 @@
-classdef lenghtCompute < handle 
+classdef lenghtComputer < handle 
     properties (Access = private)
         x
         Tn
@@ -13,12 +13,12 @@ classdef lenghtCompute < handle
     end 
 
     methods (Access = public)
-        function obj = lenghtCompute(cParams)
+        function obj = lenghtComputer(cParams)
             obj.init(cParams)
         end
 
         function compute(obj)
-            obj.lenghtCalculator()
+            obj.computeLenght()
         end
     end
     methods (Access = private)
@@ -27,7 +27,7 @@ classdef lenghtCompute < handle
             obj.Tn =cParams.Tn;
             obj.e =cParams.e;
         end
-        function lenghtCalculator(obj)
+        function computeLenght(obj)
             x1e = obj.x(obj.Tn(obj.e,1),1);
             y1e = obj.x(obj.Tn(obj.e,1),2);
             x2e = obj.x(obj.Tn(obj.e,2),1);

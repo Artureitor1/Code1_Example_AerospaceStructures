@@ -3,6 +3,11 @@ classdef solverSystemComputer < handle
     properties (Access = public)
         u
         R
+    end
+    properties (Access = private)
+        KG
+        method
+        fixNod   
 
         KLL
         KLR
@@ -16,15 +21,6 @@ classdef solverSystemComputer < handle
         vL
         vR
         uR
-    end
-    properties (Access = private)
-
-
-        KG
-        
-        method
-        nDof
-        fixNod   
     end
 
     methods (Access = public)
@@ -42,7 +38,6 @@ classdef solverSystemComputer < handle
             obj.KG = cParams.KG;
             obj.Fext = cParams.Fext;
             obj.method = cParams.method;
-            obj.nDof = cParams.nDof;
             obj.fixNod = cParams.fixNod;
         end
         function computeSplit(obj)
@@ -72,10 +67,10 @@ classdef solverSystemComputer < handle
             s.uR = obj.uR ;
             s.vL = obj.vL;
             s.vR = obj.vR;
-            B = solverMethodCompute(s);
+            B = solverMethodComputer(s);
             B.compute()
-            obj.u = B.u;
-            obj.R = B.R;
+            obj.u = B.B;
+            obj.R = B.D;
         end
     end 
 end

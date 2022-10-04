@@ -1,8 +1,6 @@
 classdef splitComputer < handle
 
     properties (Access = public)
-        
-
         uR
         vR
         vL
@@ -27,8 +25,9 @@ classdef splitComputer < handle
             obj.init(cParams)
         end
         function compute(obj)           
-            obj.conditionAsembler()
-            obj.systemAsembler()
+            obj.SplitConditions()
+            obj.splitKG()
+            obj.splitFext()
         end
     end
     methods (Access = private)
@@ -38,16 +37,16 @@ classdef splitComputer < handle
             obj.Fext = cParams.Fext;
             
         end 
-        function conditionAsembler(obj)
+        function SplitConditions(obj)
             s.fixNod = obj.fixNod;
-            B = conditionComputer(s);
+            B = splitConditionComputer(s);
             B.compute()
             obj.uR = B.uR;
             obj.vR = B.vR;
             obj.vL = B.vL;
 
         end
-        function systemAsembler(obj)
+        function splitKG(obj)
             s.KG    = obj.KG;
             s.vL    = obj.vL;
             s.vR    = obj.vR;
@@ -60,7 +59,20 @@ classdef splitComputer < handle
             obj.KRR = B.KRR;
             obj.FextR = B.FextR;
             obj.FextL = B.FextL;
-
+        end
+        function splitFext(obj)
+            s.KG    = obj.KG;
+            s.vL    = obj.vL;
+            s.vR    = obj.vR;
+            s.Fext  = obj.Fext;
+            B = splitFextComputer(s);
+            B.compute()
+            obj.KLL = B.KLL;
+            obj.KLR = B.KLR;
+            obj.KRL = B.KRL;
+            obj.KRR = B.KRR;
+            obj.FextR = B.FextR;
+            obj.FextL = B.FextL;
         end
     end
 end

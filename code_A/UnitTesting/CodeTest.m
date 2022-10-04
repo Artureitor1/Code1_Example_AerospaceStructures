@@ -4,6 +4,7 @@
 
 clear
 clc
+close all
 %% Load the workspace of the expected results
 load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\Test\KG.mat');
 load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\Test\Fext.mat');
@@ -16,9 +17,9 @@ load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\T
 
 %% Create the objects
 cParams.method  = "direct";
-Test1 = computeStructure(cParams);
+Test1 = structureComputer(cParams);
 cParams.method  = "iterative";
-Test2 = computeStructure(cParams);
+Test2 = structureComputer(cParams);
 
 %Test1 = SolverStructureDirect(cParams); %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one is used.
 %Test2 = SolverStructureIterative(cParams); %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one use.
@@ -35,7 +36,7 @@ valU_iter   = true;
 Test1.compute();
 Test2.compute();
 
-clc
+
 %% Validator
 if valKG
     if Test1.KG == KG 
@@ -68,4 +69,3 @@ if valU_iter
         error('ERROR in Displacement by iterative method');
     end
 end
-clear

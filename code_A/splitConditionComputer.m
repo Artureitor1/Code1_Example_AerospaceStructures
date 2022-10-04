@@ -1,4 +1,4 @@
-classdef conditionComputer < handle
+classdef splitConditionComputer < handle
     properties (Access = public)
         uR
         vR
@@ -10,7 +10,7 @@ classdef conditionComputer < handle
     end 
 
     methods (Access = public)
-        function obj = conditionComputer(cParams)
+        function obj = splitConditionComputer(cParams)
             obj.init(cParams);
         end
 

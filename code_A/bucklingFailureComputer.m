@@ -1,42 +1,51 @@
-classdef bucklingFailureCompute < handle
+classdef bucklingFailureComputer < handle
     properties (Access = private)
-        nEl
+        
         x
         Tn
         mat
         Tmat
         sig
+        nEl
+        
     end
     properties (Access = public)
         FB
     end 
     methods (Access = public)
-        function obj = bucklingFailureCompute(cParams)
+        function obj = bucklingFailureComputer(cParams)
             obj.init(cParams)
         end
 
         function compute(obj)
-            obj.buckling();
+            obj.computeGeometry();
+            obj.computeBuckling();
         end
     end
     methods  (Access = private)
         function init(obj,cParams)
-            obj.nEl = cParams.nEl;
             obj.x = cParams.x;
             obj.Tn = cParams.Tn;
             obj.mat = cParams.mat;
             obj.Tmat = cParams.Tmat;
             obj.sig = cParams.sig;
-
         end
-        function buckling(obj)
+        function computeGeometry(obj)
+            s.x  = obj.x;
+            s.Tn = obj.Tn;
+            B = geometryComputer(s);
+            B.compute();
+            obj.nEl = B.nEl;
+        end
+        function computeBuckling(obj)
             obj.FB = zeros(obj.nEl,1);
+            
             for e = 1:obj.nEl
 
                 s.x = obj.x;
                 s.Tn = obj.Tn;
                 s.e = e;
-                B = matrixRotationCompute(s);
+                B = matrixRotationComputer(s);
                 B.compute()
                 L   = B.le;
 

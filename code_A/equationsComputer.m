@@ -2,19 +2,19 @@ classdef equationsComputer < handle
     properties (Access = public)
         KG
         Fext
-        nEl
-        Td
+        
     end
     properties (Access = private)
+        nEl
+        Td
         x
         Tn
         Tmat
         mat
         Fdata 
  
-        ni  
         nDof   
-        nNod   
+          
         nElDof 
 
         
@@ -46,24 +46,21 @@ classdef equationsComputer < handle
             s.Tn     = obj.Tn;
             B        = geometryComputer(s);
             B.compute();
-            obj.ni   = B.ni;
             obj.nDof = B.nDof;
             obj.nEl  = B.nEl;
-            obj.nNod   = B.nNod;
-            obj.nElDof = B.nElDof;        
+            obj.nElDof = B.nElDof; 
+            obj.Td = B.Td;
         end 
         function computeStifnessMatrix(obj)
             s.nEl    = obj.nEl;
-            s.nNod   = obj.nNod;
-            s.ni     = obj.ni;
             s.Tn     = obj.Tn;
             s.x      = obj.x;
             s.Tmat   = obj.Tmat;
             s.mat    = obj.mat;
             s.nElDof = obj.nElDof;
+            s.Td     = obj.Td;
             B        = stifnessMatrixComputer(s);
             B.compute();
-            obj.Td   = B.Td;
             obj.Kel  = B.Kel;
         end
         function computeKG(obj)
