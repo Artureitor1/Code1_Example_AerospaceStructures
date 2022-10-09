@@ -1,4 +1,4 @@
-classdef forceComputer < handle
+classdef ForceComputer < handle
     properties (Access = public)
         Fext
     end
@@ -8,7 +8,7 @@ classdef forceComputer < handle
     end 
 
     methods (Access = public)
-        function obj = forceComputer(cParams)
+        function obj = ForceComputer(cParams)
             obj.init(cParams);
         end
 

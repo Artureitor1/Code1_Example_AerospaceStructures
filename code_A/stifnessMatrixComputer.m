@@ -1,4 +1,5 @@
-classdef stifnessMatrixComputer < handle
+classdef StifnessMatrixComputer < handle
+    %ElementalStiffnessMatrixComputer
     properties (Access = private)
         nEl
         Tn
@@ -9,13 +10,11 @@ classdef stifnessMatrixComputer < handle
         Td
     end
     properties (Access = public)
-
-        
         Kel
     end
 
     methods (Access = public)
-        function obj = stifnessMatrixComputer(cParams)
+        function obj = StifnessMatrixComputer(cParams)
             obj.init(cParams);
         end
 
@@ -42,7 +41,7 @@ classdef stifnessMatrixComputer < handle
                 s.x = obj.x;
                 s.Tn =obj.Tn;
                 s.e = e;
-                B = lenghtComputer(s);
+                B = LenghtComputer(s);
                 B.compute;
                 se = B.se;
                 ce = B.ce;

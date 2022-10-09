@@ -17,12 +17,9 @@ load('C:\Users\artur\Documents\GitHub\Test1-AerospaceStructures1Example\code_A\T
 
 %% Create the objects
 cParams.method  = "direct";
-Test1 = structureComputer(cParams);
+Test1 = StructureComputer(cParams);
 cParams.method  = "iterative";
-Test2 = structureComputer(cParams);
-
-%Test1 = SolverStructureDirect(cParams); %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one is used.
-%Test2 = SolverStructureIterative(cParams); %As SolverStructure is the father of the SolverStructureDirect and SolverStructureItertive. Doesnt matter wich one use.
+Test2 = StructureComputer(cParams);
 
 %% Check in Validation
 

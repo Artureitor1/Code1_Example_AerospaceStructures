@@ -1,9 +1,9 @@
-classdef solverMethodComputer < handle
+classdef SolverMethodComputer < handle
 %   [A][B]=[C]+[D]
 %
 %   [AA AB][BA] = [CA]+[DA]
 %   [AC AD][BB]   [CB] [0 ]
-%
+
    
     properties (Access = protected)
         method 
@@ -28,7 +28,7 @@ classdef solverMethodComputer < handle
         D     
     end 
     methods (Access = public)
-        function obj = solverMethodComputer(cParams)
+        function obj = SolverMethodComputer(cParams)
             obj.init(cParams)
         end
 
@@ -74,7 +74,7 @@ classdef solverMethodComputer < handle
             s.vL =obj.vL;
             s.vR =obj.vR;
 
-            B = directSolverComputer(s);
+            B = DirectSolverComputer(s);
             B.solve();
 
             obj.B = B.B;
@@ -94,7 +94,7 @@ classdef solverMethodComputer < handle
             s.vL =obj.vL;
             s.vR =obj.vR;
 
-            B = iterativeSolverComputer(s);
+            B = IterativeSolverComputer(s);
             B.solve();
 
             obj.B = B.B;

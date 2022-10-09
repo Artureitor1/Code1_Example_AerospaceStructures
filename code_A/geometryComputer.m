@@ -1,4 +1,4 @@
-classdef geometryComputer < handle
+classdef GeometryComputer < handle
     properties (Access = private)
         x
         Tn
@@ -16,7 +16,7 @@ classdef geometryComputer < handle
     end
 
     methods (Access = public)
-        function obj = geometryComputer(cParams)
+        function obj = GeometryComputer(cParams)
             obj.init(cParams);
         end
 

@@ -1,4 +1,4 @@
-classdef splitKGcomputer < handle
+classdef SplitKGcomputer < handle
     properties (Access = private)
         KG
         vL
@@ -15,7 +15,7 @@ classdef splitKGcomputer < handle
     end 
 
     methods (Access = public)
-        function obj = splitKGcomputer(cParams)
+        function obj = SplitKGcomputer(cParams)
             obj.init(cParams);
         end
 

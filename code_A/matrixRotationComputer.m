@@ -1,4 +1,4 @@
-classdef matrixRotationComputer < handle
+classdef MatrixRotationComputer < handle
     properties (Access = private)
         x
         Tn
@@ -12,7 +12,7 @@ classdef matrixRotationComputer < handle
     end
 
     methods (Access = public)
-        function obj = matrixRotationComputer(cParams)
+        function obj = MatrixRotationComputer(cParams)
             obj.init(cParams);
         end
 
@@ -31,7 +31,7 @@ classdef matrixRotationComputer < handle
             s.x = obj.x;
             s.Tn =obj.Tn;
             s.e = obj.e;
-            B = lenghtComputer(s);
+            B = LenghtComputer(s);
             B.compute;
             se = B.se;
             ce = B.ce;

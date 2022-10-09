@@ -1,4 +1,4 @@
-classdef iterativeSolverComputer < solverMethodCompute
+classdef IterativeSolverComputer < SolverMethodComputer
     methods (Access = public)
         function solve(obj)
             obj.solveSystem();

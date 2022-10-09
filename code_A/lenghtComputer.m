@@ -1,4 +1,4 @@
-classdef lenghtComputer < handle 
+classdef LenghtComputer < handle 
     properties (Access = private)
         x
         Tn
@@ -13,7 +13,7 @@ classdef lenghtComputer < handle
     end 
 
     methods (Access = public)
-        function obj = lenghtComputer(cParams)
+        function obj = LenghtComputer(cParams)
             obj.init(cParams)
         end
 

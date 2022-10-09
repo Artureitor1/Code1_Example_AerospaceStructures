@@ -1,4 +1,4 @@
-classdef structureComputer < handle
+classdef StructureComputer < handle
 
     properties (Access = private)
         x              
@@ -28,7 +28,7 @@ classdef structureComputer < handle
     end
    
     methods (Access = public)
-        function obj = structureComputer(cParams)
+        function obj = StructureComputer(cParams)
             obj.init(cParams);
         end 
         function compute(obj)
@@ -67,7 +67,7 @@ classdef structureComputer < handle
             s.fixNod = obj.fixNod;
             s.Tmat = obj.Tmat;
             s.mat = obj.mat;
-            B = equationsComputer(s);
+            B = EquationsComputer(s);
             B.compute()
             obj.KG = B.KG;
             obj.Fext = B.Fext;
@@ -77,7 +77,7 @@ classdef structureComputer < handle
             s.Fext = obj.Fext;
             s.method = obj.method;
             s.fixNod = obj.fixNod;
-            B = solverSystemComputer(s);
+            B = SolverSystemComputer(s);
             B.compute()
             obj.u = B.u;
             obj.R = B.R;
@@ -89,7 +89,7 @@ classdef structureComputer < handle
             s.mat = obj.mat;
             s.Tmat = obj.Tmat;
             s.u = obj.u;
-            B = stressStrainComputer(s);
+            B = StressStrainComputer(s);
             B.compute();
             obj.sig = B.sig;
             obj.eps = B.eps;
@@ -101,7 +101,7 @@ classdef structureComputer < handle
             s.mat = obj.mat;
             s.Tmat = obj.Tmat;
             s.sig = obj.sig;
-            B = bucklingFailureComputer(s);
+            B = BucklingFailureComputer(s);
             B.compute();
             obj.FB = B.FB;
         end

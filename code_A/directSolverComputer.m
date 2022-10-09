@@ -1,4 +1,4 @@
-classdef directSolverComputer < solverMethodCompute
+classdef DirectSolverComputer < SolverMethodComputer
     methods (Access = public)
         function solve(obj)
             obj.solveSystem();

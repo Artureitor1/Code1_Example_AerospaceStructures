@@ -1,4 +1,4 @@
-classdef equationsComputer < handle
+classdef EquationsComputer < handle
     properties (Access = public)
         KG
         Fext
@@ -22,7 +22,7 @@ classdef equationsComputer < handle
     end 
 
     methods (Access = public)
-        function obj = equationsComputer(cParams)
+        function obj = EquationsComputer(cParams)
             obj.init(cParams);
         end
 
@@ -44,7 +44,7 @@ classdef equationsComputer < handle
         function computeGeometry(obj)
             s.x      = obj.x;
             s.Tn     = obj.Tn;
-            B        = geometryComputer(s);
+            B        = GeometryComputer(s);
             B.compute();
             obj.nDof = B.nDof;
             obj.nEl  = B.nEl;
@@ -59,7 +59,7 @@ classdef equationsComputer < handle
             s.mat    = obj.mat;
             s.nElDof = obj.nElDof;
             s.Td     = obj.Td;
-            B        = stifnessMatrixComputer(s);
+            B        = StifnessMatrixComputer(s);
             B.compute();
             obj.Kel  = B.Kel;
         end
@@ -75,7 +75,7 @@ classdef equationsComputer < handle
         function forceAsembler(obj)
             s.nDof = obj.nDof ;
             s.Fdata =  obj.Fdata;
-            B = forceComputer(s);
+            B = ForceComputer(s);
             B.compute();
             obj.Fext = B.Fext;
         end 

@@ -1,4 +1,4 @@
-classdef solverSystemComputer < handle 
+classdef SolverSystemComputer < handle 
 
     properties (Access = public)
         u
@@ -24,7 +24,7 @@ classdef solverSystemComputer < handle
     end
 
     methods (Access = public)
-        function obj = solverSystemComputer(cParams)
+        function obj = SolverSystemComputer(cParams)
            obj.init(cParams);
         end
 
@@ -44,7 +44,7 @@ classdef solverSystemComputer < handle
             s.fixNod = obj.fixNod;
             s.KG     = obj.KG;
             s.Fext = obj.Fext;
-            B = splitComputer(s);
+            B = SplitComputer(s);
             B.compute()
             obj.uR = B.uR;
             obj.vR = B.vR;
@@ -67,7 +67,8 @@ classdef solverSystemComputer < handle
             s.uR = obj.uR ;
             s.vL = obj.vL;
             s.vR = obj.vR;
-            B = solverMethodComputer(s);
+            
+            B = SolverMethodComputer(s);
             B.compute()
             obj.u = B.B;
             obj.R = B.D;

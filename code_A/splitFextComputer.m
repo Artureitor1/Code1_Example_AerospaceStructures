@@ -1,4 +1,4 @@
-classdef splitFextComputer < handle
+classdef SplitFextComputer < handle
     properties (Access = private)
         vL
         vR
@@ -10,7 +10,7 @@ classdef splitFextComputer < handle
     end 
 
     methods (Access = public)
-        function obj = splitFextComputer(cParams)
+        function obj = SplitFextComputer(cParams)
             obj.init(cParams);
         end
 

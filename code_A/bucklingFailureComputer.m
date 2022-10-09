@@ -1,4 +1,4 @@
-classdef bucklingFailureComputer < handle
+classdef BucklingFailureComputer < handle
     properties (Access = private)
         
         x
@@ -13,7 +13,7 @@ classdef bucklingFailureComputer < handle
         FB
     end 
     methods (Access = public)
-        function obj = bucklingFailureComputer(cParams)
+        function obj = BucklingFailureComputer(cParams)
             obj.init(cParams)
         end
 
@@ -33,7 +33,7 @@ classdef bucklingFailureComputer < handle
         function computeGeometry(obj)
             s.x  = obj.x;
             s.Tn = obj.Tn;
-            B = geometryComputer(s);
+            B = GeometryComputer(s);
             B.compute();
             obj.nEl = B.nEl;
         end
@@ -45,7 +45,7 @@ classdef bucklingFailureComputer < handle
                 s.x = obj.x;
                 s.Tn = obj.Tn;
                 s.e = e;
-                B = matrixRotationComputer(s);
+                B = MatrixRotationComputer(s);
                 B.compute()
                 L   = B.le;
 
