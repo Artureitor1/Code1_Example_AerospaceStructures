@@ -1,16 +1,11 @@
 classdef StifnessMatrixComputer < handle
-    %ElementalStiffnessMatrixComputer
     properties (Access = private)
-        nEl
-        Tn
-        x
-        Tmat
-        mat
-        nElDof
-        Td
+        geometry
+        structure
+        elementalStifnessMatrix
     end
     properties (Access = public)
-        Kel
+        stifnessMatrix
     end
 
     methods (Access = public)
@@ -19,46 +14,38 @@ classdef StifnessMatrixComputer < handle
         end
 
         function compute(obj)
-            obj.computeKelBar()
+            obj.computeElementalStiffnessMatrices()
+            obj.computeGlobalStifnessMatrix()
         end
     end
 
     methods (Access = private)
-
-        function init(obj,cParams)
-            obj.nEl  = cParams.nEl;
-            obj.Tn   = cParams.Tn;
-            obj.x = cParams.x;
-            obj.Tmat = cParams.Tmat;
-            obj.mat = cParams.mat;
-            obj.nElDof = cParams.nElDof;
-            obj.Td = cParams.Td;
-
+        function init(obj,cParams)   
+            obj.geometry  = cParams.geometry;
+            obj.structure = cParams.structure;
         end
-        function computeKelBar(obj)
-            obj.Kel=zeros(obj.nElDof,obj.nElDof,obj.nEl);
-            for e=1:obj.nEl
-                s.x = obj.x;
-                s.Tn =obj.Tn;
-                s.e = e;
-                B = LenghtComputer(s);
-                B.compute;
-                se = B.se;
-                ce = B.ce;
-                le = B.le;
-
-
-                Ke=(obj.mat(obj.Tmat(e),2))*(obj.mat(obj.Tmat(e),1))/le * [
-                    ce^2 ce*se -(ce)^2 -ce*se
-                    ce*se se^2 -ce*se -(se)^2
-                    -(ce)^2 -ce*se ce^2 ce*se
-                    -ce*se -(se)^2 ce*se se^2
-                    ];
-
-
-                obj.Kel(:,:,e) = Ke(:,:);
+        function computeElementalStiffnessMatrices(obj)
+            s.geometry =  obj.geometry;
+            s.structure = obj.structure;
+            B = ElementalStiffnessMatricesComputer(s);
+            B.compute();
+            obj.elementalStifnessMatrix = B.elementalStifnessMatrix;
+        end 
+        function computeGlobalStifnessMatrix(obj)
+            stifnessMatrix=zeros(obj.geometry.totalDegresFredom,obj.geometry.totalDegresFredom);
+            degressConectivity = obj.geometry.degressConectivity;
+            elementalStifnessMatrix = obj.elementalStifnessMatrix;
+            
+            for element=1:obj.geometry.numberElement
+                for rowPositionLocalStifnessMatrix=1:4
+                    rowPositionGlobalStifnessMatrix= degressConectivity(element,rowPositionLocalStifnessMatrix);
+                    for columPositionLocalStifnessMatrix=1:4
+                        columPositionGlobalStifnessMatrix=degressConectivity(element,columPositionLocalStifnessMatrix);
+                        stifnessMatrix(rowPositionGlobalStifnessMatrix,columPositionGlobalStifnessMatrix)=stifnessMatrix(rowPositionGlobalStifnessMatrix,columPositionGlobalStifnessMatrix)+elementalStifnessMatrix(rowPositionLocalStifnessMatrix,columPositionLocalStifnessMatrix,element);
+                    end
+                end
             end
+            obj.stifnessMatrix = stifnessMatrix;
         end
-        
     end
 end

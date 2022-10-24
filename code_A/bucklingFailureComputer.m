@@ -1,67 +1,72 @@
 classdef BucklingFailureComputer < handle
     properties (Access = private)
-        
-        x
-        Tn
+
+        coordNodes
+        nodalConectivity
         mat
         Tmat
-        sig
-        nEl
-        
+        stress
+        numberElement
+
     end
     properties (Access = public)
-        FB
-    end 
+        bucklingFailure
+    end
     methods (Access = public)
         function obj = BucklingFailureComputer(cParams)
             obj.init(cParams)
         end
 
         function compute(obj)
-            obj.computeGeometry();
             obj.computeBuckling();
         end
     end
     methods  (Access = private)
         function init(obj,cParams)
-            obj.x = cParams.x;
-            obj.Tn = cParams.Tn;
+            obj.coordNodes = cParams.coordNodes;
+            obj.nodalConectivity = cParams.nodalConectivity;
             obj.mat = cParams.mat;
             obj.Tmat = cParams.Tmat;
-            obj.sig = cParams.sig;
-        end
-        function computeGeometry(obj)
-            s.x  = obj.x;
-            s.Tn = obj.Tn;
-            B = GeometryComputer(s);
-            B.compute();
-            obj.nEl = B.nEl;
+            obj.stress = cParams.stress;
+            obj.numberElement = cParams.numberElement;
         end
         function computeBuckling(obj)
-            obj.FB = zeros(obj.nEl,1);
-            
-            for e = 1:obj.nEl
 
-                s.x = obj.x;
-                s.Tn = obj.Tn;
-                s.e = e;
-                B = MatrixRotationComputer(s);
-                B.compute()
-                L   = B.le;
+            for element = 1:obj.numberElement
 
-                E = obj.mat(obj.Tmat(e),1);
-                I = obj.mat(obj.Tmat(e),4);
-                A = obj.mat(obj.Tmat(e),2);
+                [elementLenght] = obj.computeElementGeometry(obj.coordNodes,obj.nodalConectivity,element);
 
-                sigPan = ((pi^2)*E*I)/((L^2)*A);
-
-                if obj.sig(e)<-1
-                    if abs(obj.sig(e)) > sigPan
-                        obj.FB(e) = 1;
-                    end
-                end
+                elementElasticModul = obj.mat(obj.Tmat(element),1);
+                elementInercia = obj.mat(obj.Tmat(element),4);
+                elementArea = obj.mat(obj.Tmat(element),2);
+                criticalBuclingStress = ((pi^2)*elementElasticModul*elementInercia)/((elementLenght^2)*elementArea);
+                
+                [obj.bucklingFailure(element,1)] = obj.checkBarFailure(obj.stress(element),criticalBuclingStress,element);
             end
         end
 
-    end 
+    end
+    methods (Access = private,Static)
+        function [lenght,se,ce] = computeElementGeometry(coordNodes,nodalConectivity,element)
+            s.coordNode = coordNodes;
+            s.nodalConectivity = nodalConectivity;
+            s.element = element;
+            B = ElementGeometryComputer(s);
+            B.compute;
+            se = B.se;
+            ce = B.ce;
+            lenght = B.lenght;
+        end
+        function [bucklingFailure] = checkBarFailure(stress,criticalBuclingStress,element)
+            if stress < 0
+                if abs(stress) > criticalBuclingStress
+                   bucklingFailure = true;
+                else
+                   bucklingFailure = false;
+                end 
+            else
+                   bucklingFailure = false;
+            end
+        end
+    end
 end

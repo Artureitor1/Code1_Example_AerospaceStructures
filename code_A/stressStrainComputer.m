@@ -1,17 +1,17 @@
 classdef StressStrainComputer < handle
 
     properties (Access = private)
-        nEl 
-        Tn
-        Td
-        x
+        numberElement 
+        nodalConectivity
+        degressConectivity
+        coordNodes
         mat
         Tmat
-        u
+        displacement
     end
     properties (Access = public)
-        sig
-        eps
+        stress
+        strain
     end 
 
     methods (Access = public)
@@ -20,50 +20,63 @@ classdef StressStrainComputer < handle
         end
 
         function compute(obj)
-            obj.computeGeometry()
             obj.computeStresStrain()
         end
     end
     methods (Access = private)
         function init(obj,cParams)
-            obj.Tn =  cParams.Tn;
-            obj.x =   cParams.x;
+            obj.nodalConectivity = cParams.nodalConectivity;
+            obj.coordNodes =   cParams.coordNodes;
             obj.mat = cParams.mat;
             obj.Tmat = cParams.Tmat;  
-            obj.u = cParams.u;
+            obj.displacement = cParams.displacement;
+            obj.numberElement = cParams.numberElement;
+            obj.degressConectivity = cParams.degressConectivity;
         end 
-        function computeGeometry(obj)
-            s.x  = obj.x;
-            s.Tn = obj.Tn;
-            B = GeometryComputer(s);
-            B.compute();
-            obj.nEl = B.nEl;
-            obj.Td = B.Td;
-        end 
+
         function computeStresStrain(obj)
-            obj.eps=zeros(obj.nEl,1);
-            obj.sig=zeros(obj.nEl,1);
+            strain=zeros(obj.numberElement,1);
+            stress=zeros(obj.numberElement,1);
+            degressConectivity = obj.degressConectivity;
+            displacement = obj.displacement;
+            typesArea = obj.mat(:,1);
+            elementType = obj.Tmat;
 
-            for e=1:obj.nEl
-                ue=zeros(2*2,1);
 
-                s.x = obj.x;
-                s.Tn = obj.Tn;
-                s.e = e;
-                B = MatrixRotationComputer(s);
-                B.compute()
-                le   = B.le;
-                Re = B.Re;
+            for element=1:obj.numberElement
+                elementGlobalDisplacement=zeros(4,1);
+                [elementLength,rotationMatrix] = obj.computeMatrixRotation(obj.coordNodes,obj.nodalConectivity,element);
                 
-                for i=1:2*2
-                    I=obj.Td(e,i);
-                    ue(i,1)=obj.u(I);
+                for i=1:4
+                    postionGlobalDisplacement=degressConectivity(element,i);
+                    elementGlobalDisplacement(i,1)=displacement(postionGlobalDisplacement);
                 end
-                uep=Re*ue;
-                obj.eps(e,1)=(1/le)*[-1 0 1 0]*uep;
-                obj.sig(e,1)=obj.mat(obj.Tmat(e),1)*obj.eps(e,1);
+                elementLocalDisplacement=rotationMatrix*elementGlobalDisplacement;
+                strain(element,1)=(1/elementLength)*[-1 0 1 0]*elementLocalDisplacement;
+                stress(element,1)=typesArea(elementType(element))*strain(element,1);
             end
+            obj.strain = strain;
+            obj.stress = stress;
+
         end
 
+    end 
+    methods (Access = private,Static)
+        function  [elementLength,rotationMatrix]  = computeMatrixRotation(coordNodes,nodalConectivity,element)
+                
+                s.coordNode = coordNodes;
+                s.nodalConectivity = nodalConectivity;
+                s.element = element;
+                B = ElementGeometryComputer(s);
+                B.compute()
+                ce = B.ce;
+                se = B.se;
+                elementLength = B.lenght;
+                
+                rotationMatrix=[ce se 0 0
+                -se ce 0 0
+                0 0 ce se
+                0 0 -se ce];
+        end 
     end 
 end

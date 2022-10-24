@@ -1,23 +1,14 @@
 classdef SplitComputer < handle
 
     properties (Access = public)
-        uR
-        vR
-        vL
-
-        KLL
-        KLR
-        KRL
-        KRR
-        FextR
-        FextL
+        splitedCondition
+        splitedStifnessMatrix
+        splitedForce
     end
     properties (Access = private)
-        
-        Fext
-        nDof
-        fixNod
-        KG
+        externalForces
+        restringedNodes
+        stifnessMatrix
     end 
 
     methods (Access = public)
@@ -25,50 +16,40 @@ classdef SplitComputer < handle
             obj.init(cParams)
         end
         function compute(obj)           
-            obj.SplitConditions()
-            obj.splitKG()
+            obj.splitConditions()
+            obj.splitStifnessMatrix()
             obj.splitFext()
         end
     end
     methods (Access = private)
         function init(obj,cParams)
-            obj.fixNod = cParams.fixNod;
-            obj.KG = cParams.KG;
-            obj.Fext = cParams.Fext;
+            obj.restringedNodes = cParams.restringedNodes;
+            obj.stifnessMatrix = cParams.stifnessMatrix;
+            obj.externalForces = cParams.externalForces;
             
         end 
-        function SplitConditions(obj)
-            s.fixNod = obj.fixNod;
+        function splitConditions(obj)
+            s.restringedNodes = obj.restringedNodes;
             B = SplitConditionComputer(s);
             B.compute()
-            obj.uR = B.uR;
-            obj.vR = B.vR;
-            obj.vL = B.vL;
+            obj.splitedCondition = B.splitedCondition;
+        end
+        function splitStifnessMatrix(obj)
+            s.stifnessMatrix = obj.stifnessMatrix;
+            s.splitedCondition = obj.splitedCondition;
+            B = SplitStifnessMatrixcomputer(s);
+            B.compute();
+            obj.splitedStifnessMatrix = B.splitedStifnessMatrix;
 
         end
-        function splitKG(obj)
-            s.KG    = obj.KG;
-            s.vL    = obj.vL;
-            s.vR    = obj.vR;
-            s.Fext  = obj.Fext;
-            B = SplitKGcomputer(s);
-            B.compute()
-            obj.KLL = B.KLL;
-            obj.KLR = B.KLR;
-            obj.KRL = B.KRL;
-            obj.KRR = B.KRR;
-            obj.FextR = B.FextR;
-            obj.FextL = B.FextL;
-        end
         function splitFext(obj)
-            s.KG    = obj.KG;
-            s.vL    = obj.vL;
-            s.vR    = obj.vR;
-            s.Fext  = obj.Fext;
-            B = SplitFextComputer(s);
+            s.stifnessMatrix    = obj.stifnessMatrix;
+            s.splitedCondition = obj.splitedCondition;
+            s.externalForces  = obj.externalForces;
+            B = SplitExternalForceComputer(s);
             B.compute()
-            obj.FextR = B.FextR;
-            obj.FextL = B.FextL;
+            obj.splitedForce = B.splitedForce;
+           
         end
     end
 end

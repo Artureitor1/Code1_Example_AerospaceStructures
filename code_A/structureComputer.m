@@ -1,42 +1,32 @@
 classdef StructureComputer < handle
 
     properties (Access = private)
-        x              
-        Tn
-        F              
-        Young           
-        Area            
-        thermalCoeff   
-        Inertia   
-        method 
-        Fdata
-        fixNod
-        Tmat
-        mat
-        
-        
-        R
-        eps
-        sig
-         
+        data
+        structure
+        geometry
+        reactionForces
+        stress
+        strain
     end
     properties (Access = public)
-        Fext
-        u
-        KG
-        FB
+        displacement
+        stifnessMatrix
+        bucklingFailure
+        externalForces
     end
-   
+
     methods (Access = public)
         function obj = StructureComputer(cParams)
             obj.init(cParams);
-        end 
+        end
         function compute(obj)
-            obj.computeEquations();
-            obj.computeSolveSystem(); 
+            obj.computeGeometry
+            obj.computeStifnessMatrix
+            obj.computeForces
+            obj.computeDisplacementReaction();
             obj.computeStrainStress();
             obj.computeBucklingFailure();
-        end 
+        end
     end
     methods (Access = private)
         function init(obj,cParams)
@@ -44,80 +34,93 @@ classdef StructureComputer < handle
             obj.inputStructure(cParams);
         end
         function inputData(obj,cParams)
-            obj.F               = cParams.F;
-            obj.Young           = cParams.Young;
-            obj.Area            = cParams.Area;
-            obj.thermalCoeff    = cParams.thermal_coeff;
-            obj.Inertia         = cParams.Inertia;
-            obj.method          =  cParams.method;
+            obj.data.F               = cParams.F;
+            obj.data.Young           = cParams.Young;
+            obj.data.Area            = cParams.Area;
+            obj.data.thermalCoeff    = cParams.thermal_coeff;
+            obj.data.Inertia         = cParams.Inertia;
+            obj.data.method          = cParams.method;
         end
         function inputStructure(obj,cParams)
-            obj.Fdata       = cParams.Fdata;
-            obj.Fdata(:,3)  = cParams.Fdata(:,3) * obj.F;
-            obj.x           = cParams.x;
-            obj.Tn          = cParams.Tn;
-            obj.fixNod      = cParams.fixNod;
-            obj.Tmat        = cParams.Tmat;
-            obj.mat         = [obj.Young,obj.Area,obj.thermalCoeff,obj.Inertia];
+            obj.structure.forceData         = cParams.Fdata;
+            obj.structure.forceData(:,3)    = cParams.Fdata(:,3) * obj.data.F;
+            obj.structure.coordNodes        = cParams.x;
+            obj.structure.nodalConectivity  = cParams.Tn;
+            obj.structure.restringedNodes   = cParams.fixNod;
+            obj.structure.Tmat              = cParams.Tmat;
+            obj.structure.mat               = [obj.data.Young,obj.data.Area,obj.data.thermalCoeff,obj.data.Inertia];
         end
-        function computeEquations(obj)
-            s.x      = obj.x;
-            s.Tn     = obj.Tn;
-            s.Fdata  = obj.Fdata;
-            s.fixNod = obj.fixNod;
-            s.Tmat = obj.Tmat;
-            s.mat = obj.mat;
-            B = EquationsComputer(s);
+        function computeGeometry(obj)
+            s.coordNodes        = obj.structure.coordNodes;
+            s.nodalConectivity  = obj.structure.nodalConectivity;
+            B = GeometryComputer(s);
             B.compute()
-            obj.KG = B.KG;
-            obj.Fext = B.Fext;
-        end 
-        function computeSolveSystem(obj)
-            s.KG = obj.KG;
-            s.Fext = obj.Fext;
-            s.method = obj.method;
-            s.fixNod = obj.fixNod;
-            B = SolverSystemComputer(s);
+            obj.geometry        = B.geometry;
+        end
+        function computeStifnessMatrix(obj)
+            s.geometry = obj.geometry;
+            s.structure = obj.structure;
+            B = StifnessMatrixComputer(s);
+            B.compute();
+            obj.stifnessMatrix = B.stifnessMatrix;
+        end
+        function computeForces(obj)
+            s.totalDegresFredom  = obj.geometry.totalDegresFredom;
+            s.forceData =  obj.structure.forceData;
+            B = ForceComputer(s);
+            B.compute();
+            obj.externalForces = B.externalForces;
+        end
+        function computeDisplacementReaction(obj)
+            s.stifnessMatrix = obj.stifnessMatrix;
+            s.externalForces = obj.externalForces;
+            s.method = obj.data.method;
+            s.restringedNodes = obj.structure.restringedNodes;
+
+            B = DisplacementReactionComputer(s);
             B.compute()
-            obj.u = B.u;
-            obj.R = B.R;
-        end 
-    
+            obj.displacement = B.displacement;
+            obj.reactionForces = B.reactionForces;
+        end
+
         function computeStrainStress(obj)
-            s.Tn = obj.Tn;
-            s.x = obj.x;
-            s.mat = obj.mat;
-            s.Tmat = obj.Tmat;
-            s.u = obj.u;
+            s.nodalConectivity = obj.structure.nodalConectivity;
+            s.coordNodes = obj.structure.coordNodes;
+            s.mat = obj.structure.mat;
+            s.Tmat = obj.structure.Tmat;
+            s.displacement = obj.displacement;
+            s.numberElement = obj.geometry.numberElement;
+            s.degressConectivity = obj.geometry.degressConectivity;
             B = StressStrainComputer(s);
             B.compute();
-            obj.sig = B.sig;
-            obj.eps = B.eps;
+            obj.strain = B.strain;
+            obj.stress = B.stress;
         end
-   
+
         function computeBucklingFailure(obj)
-            s.x = obj.x;
-            s.Tn = obj.Tn;
-            s.mat = obj.mat;
-            s.Tmat = obj.Tmat;
-            s.sig = obj.sig;
+            s.coordNodes = obj.structure.coordNodes;
+            s.nodalConectivity = obj.structure.nodalConectivity;
+            s.mat = obj.structure.mat;
+            s.Tmat = obj.structure.Tmat;
+            s.stress = obj.stress;
+            s.numberElement = obj.geometry.numberElement;
             B = BucklingFailureComputer(s);
             B.compute();
-            obj.FB = B.FB;
+            obj.bucklingFailure = B.bucklingFailure;
         end
-    
-%         function ploter(obj)
-%             s.Tn = obj.Tn;
-%             s.n =obj.n;
-%             s.x =obj.x;
-%             s.nd =obj.nd;
-%             s.u =obj.u;
-%             s.sig =obj.sig;
-%             B = plotCompute(s);
-%             B.compute();
-%         end
+
+        %         function ploter(obj)
+        %             s.Tn = obj.Tn;
+        %             s.n =obj.n;
+        %             s.x =obj.x;
+        %             s.nd =obj.nd;
+        %             s.u =obj.u;
+        %             s.sig =obj.sig;
+        %             B = plotCompute(s);
+        %             B.compute();
+        %         end
     end
-  
+
 end
 
 

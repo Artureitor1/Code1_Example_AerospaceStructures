@@ -1,18 +1,10 @@
 classdef GeometryComputer < handle
     properties (Access = private)
-        x
-        Tn
-
-        nd
-        ni
-        n
-        nNod
+        coordNodes
+        nodalConectivity
     end
     properties (Access = public)      
-        nDof 
-        nEl    
-        nElDof 
-        Td
+        geometry
     end
 
     methods (Access = public)
@@ -22,37 +14,39 @@ classdef GeometryComputer < handle
 
         function compute(obj)
             obj.computeAdimensionalize()
-            obj.connectDOFs()
+            obj.connectDegressOfFredom()
         end
     end
     methods (Access = private)
         function init(obj,cParams)
-            obj.x      = cParams.x;
-            obj.Tn     = cParams.Tn;
+            obj.coordNodes  = cParams.coordNodes;
+            obj.nodalConectivity = cParams.nodalConectivity;
         end
 
-        function computeAdimensionalize(obj);
-            obj.nd = size(obj.x,2);
-            obj.ni = obj.nd;
-            obj.n = size(obj.x,1);
-            obj.nDof = obj.ni*obj.n;
-            obj.nEl = size(obj.Tn,1);
-            obj.nNod = size(obj.Tn,2);
-            obj.nElDof = obj.ni*obj.nNod;
+        function computeAdimensionalize(obj)
+            degreeFredomPerNodes = size(obj.coordNodes,2);
+            obj.geometry.degreeFredomPerElement = size(obj.coordNodes,2)*2;
+            numberNodes = size(obj.coordNodes,1);
+            obj.geometry.totalDegresFredom = degreeFredomPerNodes*numberNodes;
+            obj.geometry.numberElement = size(obj.nodalConectivity,1);
         end
-        function connectDOFs(obj)
-            obj.Td=zeros(obj.nEl,obj.nNod*obj.ni);
-            for i=1:obj.nEl
-                for j=1:obj.nNod*obj.ni
+        function connectDegressOfFredom(obj)
+            degressConectivity=zeros(obj.geometry.numberElement,obj.geometry.degreeFredomPerElement);
+            numberElement = obj.geometry.numberElement;
+            degreeFredomPerElement = obj.geometry.degreeFredomPerElement;
+            nodalConectivity = obj.nodalConectivity;
+
+            for i=1:numberElement
+                for j=1:degreeFredomPerElement
                     if (-1)^j==1
-                        obj.Td(i,j)=2*obj.Tn(i,j-j/2);
+                        degressConectivity(i,j)=2*nodalConectivity(i,j-j/2);
                     end
-
                     if (-1)^j==-1
-                        obj.Td(i,j)=2*obj.Tn(i,j-j*(j-1)/(2*j))-1;
+                        degressConectivity(i,j)=2*nodalConectivity(i,j-j*(j-1)/(2*j))-1;
                     end
                 end
             end
+            obj.geometry.degressConectivity = degressConectivity;
         end
         
     end

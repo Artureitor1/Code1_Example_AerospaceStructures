@@ -1,10 +1,10 @@
 classdef ForceComputer < handle
     properties (Access = public)
-        Fext
+        externalForces
     end
     properties (Access = private)
-        nDof
-        Fdata  
+        totalDegresFredom
+        forceData  
     end 
 
     methods (Access = public)
@@ -18,19 +18,23 @@ classdef ForceComputer < handle
     end
     methods  (Access = protected)
         function init(obj,cParams)
-            obj.nDof = cParams.nDof;
-            obj.Fdata = cParams.Fdata;
+            obj.totalDegresFredom = cParams.totalDegresFredom;
+            obj.forceData = cParams.forceData;
         end
 
-        function computeF (obj)
-            obj.Fext=zeros(obj.nDof,1);
-            for i=1:length(obj.Fdata)
-                if obj.Fdata(i,2) == 2 % even case
-                    obj.Fext(obj.Fdata(i,1)*2,1)=obj.Fdata(i,3);
+        function computeF(obj)
+            externalForces = zeros(obj.totalDegresFredom,1);
+            forceNode = obj.forceData(:,1);
+            forceMagnitude = obj.forceData(:,3);
+            
+            for i=1:length(obj.forceData)
+                if obj.forceData(i,2) == 2 
+                    externalForces(forceNode(i)*2,1)=forceMagnitude(i);
                 else
-                    obj.Fext((obj.Fdata(i,1)*2)-1,1)=obj.Fdata(i,3); %odd case
+                    externalForces((forceNode(i)*2)-1,1)=forceMagnitude(i);
                 end
             end
+            obj.externalForces = externalForces;
         end
     end
 end

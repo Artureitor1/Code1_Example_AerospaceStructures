@@ -1,12 +1,9 @@
 classdef SplitConditionComputer < handle
     properties (Access = public)
-        uR
-        vR
-        vL
+        splitedCondition 
     end
     properties (Access = private)
-        fixNod
-        
+        restringedNodes
     end 
 
     methods (Access = public)
@@ -20,23 +17,28 @@ classdef SplitConditionComputer < handle
     end
     methods  (Access = protected)
         function init(obj,cParams)
-            obj.fixNod = cParams.fixNod;
+            obj.restringedNodes = cParams.restringedNodes;
         end
 
         function applyCond(obj)
-            obj.uR = zeros(size(obj.fixNod,1),1);
-            obj.vR = zeros(size(obj.fixNod,1),1);
-            v = linspace(1,16,16);
-            for i = 1:size(obj.uR,1)
-                if (obj.fixNod(i,2))== 2
-                    obj.vR(i,1) = 2*obj.fixNod(i,1);
-                    obj.uR(i,1) = obj.fixNod(i,3);
+            nodes = obj.restringedNodes(:,1);
+            degree = obj.restringedNodes(:,2);
+            magnitude = obj.restringedNodes(:,3);
+            displacementRestringedNodes = zeros(size(obj.restringedNodes,1),1);
+            imposedDegress = zeros(size(obj.restringedNodes,1),1);
+            
+            for i = 1:size(displacementRestringedNodes,1)
+                if (degree(i))== 2
+                    imposedDegress(i,1) = 2*nodes(i,1);
+                    displacementRestringedNodes(i,1) = magnitude(i);
                 else
-                    obj.vR(i,1) = 2*(obj.fixNod(i,1))-1;
-                    obj.uR(i,1) = obj.fixNod(i,3);
+                    imposedDegress(i,1) = 2*(nodes(i,1))-1;
+                    displacementRestringedNodes(i,1) = magnitude(i);
                 end
             end
-            obj.vL = transpose (setdiff(v,obj.vR));
+            obj.splitedCondition.displacementRestringedNodes = displacementRestringedNodes;
+            obj.splitedCondition.imposedDegress = imposedDegress;
+            obj.splitedCondition.freeDegress = transpose (setdiff(linspace(1,16,16),obj.splitedCondition.imposedDegress));
         end
     end
 end

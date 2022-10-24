@@ -1,6 +1,6 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%   UNIT TESTING SCRIPT   %%%%%%%%%  
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%   UNIT TESTING SCRIPT Global   %%%%%%%%%  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear
 clc
@@ -36,33 +36,33 @@ Test2.compute();
 
 %% Validator
 if valKG
-    if Test1.KG == KG 
-        disp('Stifness matrix OK!');
+    if Test1.stifnessMatrix == KG 
+        fprintf('{Stifness matrix}');cprintf('_green', '{true}');disp('|');
     else
-        error('ERROR in Stifness matrix ');
+        fprintf('{Stifness matrix}');cprintf('_red', '{false}');disp('|');
     end
 end
 
 if valFext
-    if Test1.Fext == Fext
-        disp('Complete Forces OK!');
+    if Test1.externalForces == Fext
+        fprintf('{External forces}');cprintf('_green', '{true}');disp('|');
     else
-        error('ERROR in Complete Forces');
+        fprintf('{External forces}');cprintf('_red', '{false}');disp('|');
     end
 end
 
 if valU_dir
-    if Test1.u == u_dir
-        disp('Displacement by direct method OK!');
+    if Test1.displacement == u_dir
+        fprintf('{Displacement}{Direct Method}');cprintf('_green', '{true}');disp('|');
     else
-        error('ERROR in Displacement by direct method');
+        fprintf('{Displacement}{Direct Method}');cprintf('_red', '{false}');disp('|');
     end
 end
 
 if valU_iter
-    if Test2.u == u_iter
-        disp('Displacement by iterative method OK!');
+    if Test2.displacement == u_iter
+        fprintf('{Displacement}{Iterative Method}');cprintf('_green', '{true}');disp('|');
     else
-        error('ERROR in Displacement by iterative method');
+        fprintf('{Displacement}{Iterative Method}');cprintf('_red', '{false}');disp('|');
     end
 end

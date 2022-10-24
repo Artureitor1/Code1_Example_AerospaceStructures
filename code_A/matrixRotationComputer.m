@@ -1,14 +1,13 @@
 classdef MatrixRotationComputer < handle
     properties (Access = private)
-        x
-        Tn
-        e
+        coordNodes
+        nodalConectivity
+        element
         
     end
     properties (Access = public)
-
-        le
-        Re
+        lenght
+        rotationMatrix
     end
 
     methods (Access = public)
@@ -22,25 +21,32 @@ classdef MatrixRotationComputer < handle
     end
     methods (Access = private)
         function init(obj,cParams)
-            obj.x = cParams.x;
-            obj.Tn = cParams.Tn;
-            obj.e = cParams.e;
+            obj.coordNodes = cParams.coordNodes;
+            obj.nodalConectivity = cParams.nodalConectivity;
+            obj.element = cParams.element;
                 
         end 
         function computeMatrixRotation(obj)
-            s.x = obj.x;
-            s.Tn =obj.Tn;
-            s.e = obj.e;
-            B = LenghtComputer(s);
-            B.compute;
-            se = B.se;
-            ce = B.ce;
-            obj.le = B.le;
 
-            obj.Re=[ce se 0 0
+            [obj.lenght,se,ce] = obj.computeElementGeometry(obj.coordNodes,obj.nodalConectivity,obj.element);
+
+            obj.rotationMatrix=[ce se 0 0
                 -se ce 0 0
                 0 0 ce se
                 0 0 -se ce];
         end
     end
+    methods (Access = private,Static)
+        function [lenght,se,ce] = computeElementGeometry(coordNodes,nodalConectivity,element)
+            s.coordNode = coordNodes;
+            s.nodalConectivity = nodalConectivity;
+            s.element = element;
+            B = ElementGeometryComputer(s);
+            B.compute;
+            se = B.se;
+            ce = B.ce;
+            lenght = B.lenght;
+        end 
+    end 
+    
 end
